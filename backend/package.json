@@ -1,0 +1,44 @@
+{
+  "name": "@gclient/backend",
+  "version": "1.0.0",
+  "description": "Backend service for the G-Client Learner Registration Management System (LRMS). Handles authentication, role-based access control, course management, and learner onboarding.",
+  "keywords": [
+    "backend",
+    "api",
+    "express",
+    "nodejs",
+    "prisma",
+    "postgresql",
+    "auth",
+    "otp",
+    "jwt",
+    "rbac",
+    "registration",
+    "learner-management",
+    "admin-dashboard",
+    "gclient",
+    "lrms"
+  ],
+  "homepage": "https://github.com/yasiramus/gclient-registration-sysytem#readme",
+  "bugs": {
+    "url": "https://github.com/yasiramus/gclient-registration-sysytem/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yasiramus/gclient-registration-sysytem.git"
+  },
+  "license": "ISC",
+  "author": "Yasira Musah",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --runInBand --detectOpenHandles --passWithNoTests"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.14",
+    "tsx": "^4.20.3"
+  }
+}
