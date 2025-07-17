@@ -1,4 +1,16 @@
+# Keep environment variables out of version control
 node_modules
 .vscode
 .env
 backend/.env
+
+backend/generated/prisma
+
+backend/generated/prisma
+/backend.yarn/
+backend/yarn.lock
+
+# Ignore lockfile from other package managers
+package-lock.json
+yarn.lock
+.pnpm-debug.log
