@@ -1,5 +1,6 @@
 import { prisma } from './client';
-import { hashPassword } from '../utils/hashPassword';
+import { hashPassword } from '../lib/hash';
+import { Role } from '../../generated/prisma';
 
 const seedSuperAdmin = async () => {
 
@@ -10,7 +11,7 @@ const seedSuperAdmin = async () => {
         console.log(`✅ Admin user already exists: ${adminEmail}`);
         return;
     }
-    
+
     if (process.env.NODE_ENV !== 'development') {
         throw new Error("Seeding is only allowed in development");
     }
@@ -23,9 +24,8 @@ const seedSuperAdmin = async () => {
             lastName: 'Admin',
             email: adminEmail,
             passwordHash: hashedPassword,
-            role: 'ADMIN',
+            role: Role.SUPER_ADMIN,
             isVerified: true,
-            otp: '000000',
         },
     });
 

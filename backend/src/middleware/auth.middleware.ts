@@ -3,7 +3,7 @@ import { NextFunction, Request as ExpressRequest, Response } from "express";
 import jwt, { Secret } from "jsonwebtoken";
 
 export interface Request extends ExpressRequest {
-    user?: any; // Optional user property
+  user?: any; // Optional user property
 }
 
 /**
@@ -13,37 +13,36 @@ export interface Request extends ExpressRequest {
  * @param next - Next function to call the next middleware
  */
 export const authenticate = (
-    req: Request,
-    res: Response,
-    next: NextFunction
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) => {
-    try {
-        const jwtSecret: Secret = process.env.JWT_SECRET || "";
-        const authHeader = req.headers.authorization;
+  try {
+    const jwtSecret: Secret = process.env.JWT_SECRET || "";
+    const authHeader = req.headers.authorization;
 
-        if (!authHeader || !authHeader.startsWith("Bearer "))
-            return res.status(401).json({ message: "Missing or malformed token" });
+    if (!authHeader || !authHeader.startsWith("Bearer "))
+      return res.status(401).json({ message: "Missing or malformed token" });
 
-        const token = authHeader.split(" ")[1];
-        const decodedToken = jwt.verify(token, jwtSecret);
-        req.user = decodedToken;
-        next();
-    } catch (err: any) {
-        console.error("JWT Error:", err.message);
-        return res.status(401).json({ message: "Unauthorized: Invalid token" });
-    }
+    const token = authHeader.split(" ")[1];
+    const decodedToken = jwt.verify(token, jwtSecret);
+    req.user = decodedToken;
+    next();
+  } catch (err: any) {
+    console.error("JWT Error:", err.message);
+    return res.status(401).json({ message: "Unauthorized: Invalid token" });
+  }
 };
 
 export const authorizeRoles = (...allowedRoles: string[]) => {
-    console.log("Allowed roles:", allowedRoles);
-    return (req: Request, res: Response, next: NextFunction) => {
-        if (!req.user || !allowedRoles.includes(req.user.role)) {
-            return res
-                .status(403)
-                .json(
-                    "Access Denied, You do not have permission to perform this action"
-                );
-        }
-        next();
-    };
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user || !allowedRoles.includes(req.user.role)) {
+      return res
+        .status(403)
+        .json(
+          "Access Denied, You do not have permission to perform this action"
+        );
+    }
+    next();
+  };
 };

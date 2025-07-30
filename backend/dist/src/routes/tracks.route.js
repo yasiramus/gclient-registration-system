@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const prisma_1 = require("../../generated/prisma");
+const auth_middleware_1 = require("../middleware/auth.middleware");
+const tracks_controller_1 = require("../controllers/tracks.controller");
+const trackRoute = (0, express_1.Router)();
+trackRoute.post("/", auth_middleware_1.authenticate, (0, auth_middleware_1.authorizeRoles)(prisma_1.Role.SUPER_ADMIN || prisma_1.Role.ADMIN), tracks_controller_1.createTrack);
+trackRoute.get("/", tracks_controller_1.getAllTracks);
+trackRoute.get("/:id", tracks_controller_1.getTracks);
+trackRoute.delete("/delete/:id", tracks_controller_1.deleteTrack);
+trackRoute.put("/update/:id", tracks_controller_1.updateTrack);
+exports.default = trackRoute;

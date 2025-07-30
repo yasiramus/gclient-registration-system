@@ -4,8 +4,7 @@ node_modules
 .env
 backend/.env
 
-backend/generated/prisma
-
+# Generated files
 backend/generated/prisma
 /backend.yarn/
 backend/yarn.lock

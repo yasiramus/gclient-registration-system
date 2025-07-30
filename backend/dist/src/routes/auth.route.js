@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const prisma_1 = require("../../generated/prisma");
+const auth_middleware_1 = require("../middleware/auth.middleware");
+const users_controller_1 = require("../controllers/users.controller");
+const authRoute = (0, express_1.Router)();
+authRoute.post("/admin/register", auth_middleware_1.authenticate, (0, auth_middleware_1.authorizeRoles)(prisma_1.Role.SUPER_ADMIN), users_controller_1.registerAdmin);
+authRoute.post("/verify-email", users_controller_1.verifyEmail);
+authRoute.post("/login", users_controller_1.login);
+authRoute.get("/request-verification/:email", users_controller_1.resendVerificationCode);
+authRoute.get("/forgot-password/:email", users_controller_1.requestPasswordReset);
+authRoute.post("/reset-password/:email", users_controller_1.resetPassword);
+exports.default = authRoute;
