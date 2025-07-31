@@ -25,6 +25,12 @@ enum VerificationType {
   RESET
 }
 
+enum PaymentStatus {
+  FULL
+  PARTIAL
+  NONE
+}
+
 model User {
   id           String   @id @default(uuid())
   firstName    String

@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { Role } from "../../generated/prisma";
 
-import { authenticate, authorizeRoles } from "../middleware/auth.middleware";
+import { authorizeRoles, requireAuth } from "../middleware/auth.middleware";
 import {
   createTrack,
   deleteTrack,
@@ -13,16 +13,16 @@ import {
 
 const trackRoute = Router();
 
-trackRoute.post(
-  "/",
-  authenticate,
-  authorizeRoles(Role.SUPER_ADMIN || Role.ADMIN),
-  createTrack
-);
-
+// Public Routes
 trackRoute.get("/", getAllTracks);
 trackRoute.get("/:id", getTracks);
-trackRoute.delete("/delete/:id", deleteTrack);
-trackRoute.put("/update/:id", updateTrack);
+
+// Group Protected Routes
+trackRoute.use(requireAuth);
+trackRoute.use(authorizeRoles(Role.SUPER_ADMIN || Role.ADMIN));
+//protected routes
+trackRoute.post("/", createTrack);
+trackRoute.put("/:id", updateTrack);
+trackRoute.delete("/:id", deleteTrack);
 
 export default trackRoute;

@@ -67,6 +67,10 @@ export const verifyEmail = async (req: Request, res: Response) => {
     }
 
     const result = await verifyOTPService(code);
+    //auto log the user
+    if (req.session) {
+      req.session.user = { id: result.data.id, role: result.data.role };
+    }
     return res.status(200).json(result);
   } catch ({ message }: any) {
     console.error("Error verifying user email: ", message);
@@ -76,6 +80,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
   }
 };
 
+/**resendVerificationCode */
 export const resendVerificationCode = async (req: Request, res: Response) => {
   try {
     const { email } = req.params;
@@ -89,6 +94,7 @@ export const resendVerificationCode = async (req: Request, res: Response) => {
   }
 };
 
+/**requestPasswordReset */
 export const requestPasswordReset = async (req: Request, res: Response) => {
   try {
     const { email } = req.params;
@@ -105,6 +111,7 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
   }
 };
 
+/**resetPassword */
 export const resetPassword = async (req: Request, res: Response) => {
   try {
     const { email } = req.params;
@@ -120,7 +127,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 };
 
 /**
- * Log in a user and return a JWT token.
+ * Log in a user and set session.
  * @param req - Express request object
  * @param res - Express response object
  */
@@ -135,13 +142,22 @@ export const login = async (req: Request, res: Response) => {
         .json({ message: "Email and password are required" });
     }
     const saveUser = await logIn(data);
-
+    //set session data in cookie
+    if (req.session) {
+      req.session.user = { id: saveUser.id, role: saveUser.role };
+    }
     res.status(200).json({
       message: "User logged successful",
-      data: saveUser,
     });
   } catch ({ message }: any) {
     console.error("Login error:", message);
     res.status(500).json({ message });
   }
+};
+
+/**logout clear session */
+export const logout = (req: Request, res: Response) => {
+  req.session = null;
+  res.clearCookie("admin_session.sig");
+  return res.status(200).json({ message: "Logged out successfully" });
 };

@@ -1,5 +1,6 @@
 import express from "express";
 import morgan from "morgan";
+import helmet from "helmet";
 import cors from "cors";
 
 import { dbConnection } from "./db";
@@ -8,6 +9,7 @@ import trackRoute from "./routes/tracks.route";
 import coursesRoute from "./routes/courses.route";
 import { upload } from "./middleware/upload.middleware";
 import { globalRateLimiter } from "./middleware/rate.limiter";
+import { cookie_session } from "./middleware/cookie_session.middleware";
 
 const app = express();
 const mainRouter = express.Router(); //main router
@@ -27,7 +29,9 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+app.use(helmet());
 
+app.use(cookie_session);
 app.use(globalRateLimiter);
 
 app.use(upload.single("image"));
@@ -57,7 +61,7 @@ app.use(
     res: express.Response,
     next: express.NextFunction
   ) => {
-    console.error("err stack: ", err.stack);
+    console.error("type_of_error: ", err.stack);
     res.status(err.status || 500).json({
       status: "failed",
       message: err.message || "Internal Server route Error",

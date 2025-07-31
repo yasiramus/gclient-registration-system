@@ -1,5 +1,5 @@
 import { prisma } from "../db/client";
-import { generateToken } from "../lib/jwt";
+// import { generateToken } from "../lib/jwt";
 import { IUser } from "../interfaces/user.int";
 import { generateVerificationToken } from "../lib/token";
 import { VerificationType } from "../../generated/prisma";
@@ -103,14 +103,18 @@ export const verifyOTPService = async (code: string) => {
   });
 
   // mark user as verified
-  await prisma.user.update({
+  const isVerified = await prisma.user.update({
     where: { id: record.userId },
     data: { isVerified: true },
   });
 
-  console.log("Email verified for user ID:", record.userId);
-
-  return { success: true, message: "Email verified" };
+  if (!isVerified) throw new Error("Error verifying user");
+  console.log("Email verified for user ID:", isVerified.id);
+  return {
+    success: true,
+    message: "Email verified",
+    data: { id: isVerified.id, role: isVerified.role },
+  };
 };
 
 /**
@@ -279,15 +283,12 @@ export const logIn = async (user: IUser) => {
     throw new Error("Invalid credentials");
   }
 
-  const token = generateToken(existingUser.id, existingUser.role);
-
-  if (!token) {
-    throw new Error("Error generating token");
-  }
-
+  // NOTE: Reserved generateToken for email verification, password reset, or public API auth
+  // const token = generateToken(existingUser.id, existingUser.role);
   return {
     id: existingUser.id,
     role: existingUser.role,
-    token,
+    email: existingUser.email,
+    fullName: `${existingUser.firstName} ${existingUser.lastName}`,
   };
 };

@@ -5,6 +5,7 @@ export const globalRateLimiter = rateLimit({
   limit: 10, // Limit each IP to 10 requests per `window`
   standardHeaders: true,
   legacyHeaders: false,
+  ipv6Subnet: 60,
   message: {
     status: 429,
     message: "Too many requests, please try again later.",

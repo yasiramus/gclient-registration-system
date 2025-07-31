@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import { Role } from "../../generated/prisma";
-import { authenticate, authorizeRoles } from "../middleware/auth.middleware";
+import { requireAuth, authorizeRoles } from "../middleware/auth.middleware";
 import {
   requestPasswordReset,
   resetPassword,
@@ -9,13 +9,14 @@ import {
   registerAdmin,
   verifyEmail,
   resendVerificationCode,
-} from "../controllers/users.controller";
+  logout,
+} from "../controllers/auth.controller";
 
 const authRoute = Router();
 
 authRoute.post(
   "/admin/register",
-  authenticate,
+  requireAuth,
   authorizeRoles(Role.SUPER_ADMIN),
   registerAdmin
 );
@@ -23,6 +24,7 @@ authRoute.post(
 authRoute.post("/verify-email", verifyEmail);
 
 authRoute.post("/login", login);
+authRoute.post("/logout", logout);
 
 authRoute.get("/request-verification/:email", resendVerificationCode);
 authRoute.get("/forgot-password/:email", requestPasswordReset);
