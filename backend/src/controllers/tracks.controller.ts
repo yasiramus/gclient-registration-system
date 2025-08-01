@@ -2,31 +2,21 @@ import { Request, Response } from "express";
 
 import { Prisma } from "../../generated/prisma";
 import * as trackService from "../services/tracks.service";
+import { createTrackSchema } from "../schema";
+import z from "zod";
 
 /**createTrack */
 export const createTrack = async (req: Request, res: Response) => {
   try {
-    if (!req.body) {
-      return res.json({ body_data: req.body });
-    }
-    const { name, price, duration, instructor, description } = req.body;
+    const data = {
+      ...req.body,
+      image: req.file?.originalname,
+    };
 
-    if (!req.file) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Image file is required" });
-    }
+    //validate fields
+    const parsed = createTrackSchema.parse(data);
 
-    const image = req.file.filename;
-
-    const newTrack = await trackService.createTrack({
-      name,
-      price: Prisma.Decimal(price),
-      duration,
-      instructor,
-      description,
-      image,
-    });
+    const newTrack = await trackService.createTrack(parsed);
 
     return res.status(201).json({
       success: true,
@@ -35,10 +25,15 @@ export const createTrack = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error("Create Track Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: error.message || "Failed to create track",
-    });
+
+    if (error instanceof z.ZodError) {
+      return res.status(500).json({
+        success: false,
+        message: error.issues[0].message || "Failed to create track",
+      });
+    }
+
+    return res.status(409).json({ message: "Track name already exists" });
   }
 };
 
@@ -58,12 +53,10 @@ export const getAllTracks = async (_req: Request, res: Response) => {
 export const getTracks = async (req: Request, res: Response) => {
   try {
     const track = await trackService.getTrackById(req.params.id);
-    if (!track) return res.status(404).json({ error: "Track not found" });
+    if (!track) return res.status(404).json({ message: "Track not found" });
     return res.json(track);
   } catch (err: any) {
-    return res
-      .status(500)
-      .json({ error: err.message || "Error retrieving track" });
+    return res.status(500).json({ message: "Error retrieving track" });
   }
 };
 
@@ -73,9 +66,10 @@ export const updateTrack = async (req: Request, res: Response) => {
     if (!req.body) throw new Error(req.body);
     const { name, price, duration, instructor, description } = req.body;
     const image = req.file?.filename;
+
     const updatedTrack = await trackService.updateTrack(req.params.id, {
       name,
-      price: Prisma.Decimal(price),
+      price: Prisma.Decimal(Number(price)),
       duration,
       instructor,
       description,
@@ -97,14 +91,12 @@ export const updateTrack = async (req: Request, res: Response) => {
 // deleteTrack;
 export const deleteTrack = async (req: Request, res: Response) => {
   try {
-    await trackService.deleteTrack(req.params.id);
-    return res
-      .status(204)
-      .json(`${req.params.id} has been deleted successfully`);
+    const { id } = req.params;
+
+    const deleted = await trackService.deleteTrack(id);
+    return res.status(200).json({ message: deleted });
   } catch (err: any) {
-    console.log("delete_track", err.message);
-    return res
-      .status(500)
-      .json({ error: err.message || "Failed to delete track" });
+    console.log("delete_track", err);
+    return res.status(500).json({ message: "Failed to delete track" });
   }
 };

@@ -27,17 +27,22 @@ export const getCourseById = async (id: string) => {
   return course;
 };
 
-export const updateCourse = async (id: string, data: Course) => {
+export const updateCourse = async (
+  id: string,
+  data: Omit<Course, "id" | "createdAt" | "updatedAt">
+) => {
   if (!id) throw new Error("No id provided");
+
   const course = await prisma.course.findUnique({ where: { id } });
   if (!course) throw new Error("Course not found");
 
-  if (data.trackId) {
-    const track = await prisma.track.findUnique({
-      where: { id: data.trackId },
-    });
-    if (!track) throw new Error("Invalid trackId");
-  }
+  if (!data) throw new Error("No data provided");
+  // if (data.trackId) {
+  const track = await prisma.track.findUnique({
+    where: { id: data.trackId },
+  });
+  if (!track) throw new Error("Invalid trackId");
+  // }
 
   return prisma.course.update({ where: { id }, data });
 };

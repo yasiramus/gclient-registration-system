@@ -26,9 +26,9 @@ enum VerificationType {
 }
 
 enum PaymentStatus {
-  FULL
+  PAID
   PARTIAL
-  NONE
+  PENDING
 }
 
 model User {
@@ -66,9 +66,9 @@ model Track {
   duration    String
   instructor  String
   description String
+  image       String
   courses     Course[]
   learner     Learner[]
-  image       String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
@@ -87,14 +87,15 @@ model Course {
   @@index([trackId])
 }
 
-// prisma/schema.prisma
 model Learner {
   id            String        @id @default(uuid())
-  name          String
+  firstName     String
+  lastName      String
   email         String        @unique
+  password      String
   trackId       String
   courseId      String
-  paymentStatus PaymentStatus @default(NONE)
+  paymentStatus PaymentStatus @default(PENDING)
   invoices      Invoice[]
   track         Track         @relation(fields: [trackId], references: [id])
   course        Course        @relation(fields: [courseId], references: [id])
@@ -102,13 +103,13 @@ model Learner {
 }
 
 model Invoice {
-  id          String        @id @default(uuid())
-  learnerId   String
-  amountPaid  Float
-  paymentType PaymentStatus
-  dueAmount   Float
-  createdAt   DateTime      @default(now())
-  learner     Learner       @relation(fields: [learnerId], references: [id])
+  id         String        @id @default(uuid())
+  learnerId  String
+  amountPaid Float
+  status     PaymentStatus
+  dueAmount  Float
+  learner    Learner       @relation(fields: [learnerId], references: [id])
+  createdAt  DateTime      @default(now())
 
   @@index([learnerId])
 }

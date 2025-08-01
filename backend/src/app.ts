@@ -11,6 +11,7 @@ import coursesRoute from "./routes/courses.route";
 import { upload } from "./middleware/upload.middleware";
 import { globalRateLimiter } from "./middleware/rate.limiter";
 import { cookie_session } from "./middleware/cookie_session.middleware";
+import invoiceRoute from "./routes/invoice.route";
 
 const app = express();
 const mainRouter = express.Router(); //main router
@@ -44,6 +45,7 @@ mainRouter.use("/auth", authRoute);
 mainRouter.use("/tracks", trackRoute);
 mainRouter.use("/courses", coursesRoute);
 mainRouter.use("/learners", learnerRoute);
+mainRouter.use("/invoice", invoiceRoute);
 
 app.get("/", (req, res) => {
   res.send("Welcome to the GClient Registration System API");

@@ -12,3 +12,6 @@ export const cookie_session = cookieSession({
   expires: generateExpirationDate(1, 0), //set to 1hour
   sameSite: "strict",
 });
+
+// errol and make payment before they can access coursees
+// the learner register by themselfves

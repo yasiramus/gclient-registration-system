@@ -66,6 +66,27 @@ export const registerAUser = async (user: IUser) => {
   };
 };
 
+export const registerALearner = async (user: IUser) => {
+  const { firstName, lastName, email, password } = user;
+
+  const existingUser = await prisma.learner.findUnique({ where: { email } });
+
+  //user exit
+  if (existingUser) {
+    throw new Error("User already exists");
+  }
+
+  const passwordHash = await hashPassword(password); //hash password
+
+  if (!passwordHash) {
+    throw new Error("Error hashing password");
+  }
+
+  // const errolledAStudent = await prisma.learner.create({
+  //   data:{fistName}
+  // })
+};
+
 /**
  * Verify the user's email using the provided code.
  * @param code - The verification code sent to the user's email

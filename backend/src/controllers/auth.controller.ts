@@ -54,6 +54,35 @@ export const registerAdmin = async (req: Request, res: Response) => {
   }
 };
 
+// export const registerALearner = async (req: Request, res: Response) => {
+//   try {
+//     const { firstName, lastName, email, password } = req.body;
+
+//     if (!firstName || !lastName || !email || !password) {
+//       return res.status(400).json({
+//         message: "All fields are required",
+//       });
+//     }
+
+//     const user: IUser = {
+//       firstName,
+//       lastName,
+//       email,
+//       password,
+//     };
+
+//     const newUser = await registerALearner(user);
+//     return res.status(201).json({
+//       message: "Successfully enrolled a student. share credentials with them.",
+//       data: newUser,
+//     });
+//   } catch (error: any) {
+//     console.error("Error registering enrolling a student: ", error.message);
+//     return res.status(500).json({
+//       message: error.message || "Internal server error",
+//     });
+//   }
+// };
 /**
  * Verify the user's email using the provided code and email address.
  * @param req - Express request object

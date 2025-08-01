@@ -60,10 +60,7 @@ export const requireAuth = (
   res: Response,
   next: NextFunction
 ) => {
-  console.log("Session in protected route:", req.session);
-
   if (!req.session?.user?.id) {
-    console.log("session: ", req.session);
     return res.status(401).json({ message: "Unauthorized: No session found" });
   }
   next();
@@ -72,7 +69,6 @@ export const requireAuth = (
 export const authorizeRoles = (roles: "ADMIN" | "SUPER_ADMIN") => {
   return (req: Request, res: Response, next: NextFunction) => {
     const userRole = req.session?.user?.role;
-    console.log("role: ", userRole);
     if (!userRole || !roles.includes(userRole)) {
       return res.status(403).json({
         message:
