@@ -6,6 +6,7 @@ import cors from "cors";
 import { dbConnection } from "./db";
 import authRoute from "./routes/auth.route";
 import trackRoute from "./routes/tracks.route";
+import learnerRoute from "./routes/learner.route";
 import coursesRoute from "./routes/courses.route";
 import { upload } from "./middleware/upload.middleware";
 import { globalRateLimiter } from "./middleware/rate.limiter";
@@ -42,6 +43,7 @@ app.use("/gclient/api", mainRouter); //main router entry
 mainRouter.use("/auth", authRoute);
 mainRouter.use("/tracks", trackRoute);
 mainRouter.use("/courses", coursesRoute);
+mainRouter.use("/learners", learnerRoute);
 
 app.get("/", (req, res) => {
   res.send("Welcome to the GClient Registration System API");

@@ -14,8 +14,8 @@ import {
 const trackRoute = Router();
 
 // Public Routes
-trackRoute.get("/", getAllTracks);
 trackRoute.get("/:id", getTracks);
+trackRoute.get("/", getAllTracks);
 
 // Group Protected Routes
 trackRoute.use(requireAuth);
