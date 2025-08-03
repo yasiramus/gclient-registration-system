@@ -10,12 +10,12 @@ export const createCourse = async (
   return prisma.course.create({ data });
 };
 
-export const getAllCourses = async () => {
-  return prisma.course.findMany({
-    include: { track: true },
-    orderBy: { createdAt: "desc" },
-  });
-};
+// export const getAllCourses = async () => {
+//   return prisma.course.findMany({
+//     include: { track: true },
+//     orderBy: { createdAt: "desc" },
+//   });
+// };
 
 export const getCourseById = async (id: string) => {
   if (!id) throw new Error("No id provided");
@@ -42,7 +42,6 @@ export const updateCourse = async (
     where: { id: data.trackId },
   });
   if (!track) throw new Error("Invalid trackId");
-  // }
 
   return prisma.course.update({ where: { id }, data });
 };
@@ -52,7 +51,8 @@ export const deleteCourse = async (id: string) => {
   const course = await prisma.course.findUnique({ where: { id } });
   if (!course) throw new Error("Course not found");
 
-  return prisma.course.delete({ where: { id } });
+  const deleted = await prisma.course.delete({ where: { id } });
+  return `${deleted.title} has been removed from tracks`;
 };
 
 /**with filters */
@@ -78,9 +78,10 @@ export const findAllWithFilters = async ({
     }),
     prisma.course.count({ where }),
   ]);
+  if (!courses) throw new Error("No courses found");
 
   return {
-    data: courses,
+    courses,
     page,
     totalPages: Math.ceil(total / limit),
     totalItems: total,

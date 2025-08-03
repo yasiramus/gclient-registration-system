@@ -13,31 +13,84 @@ const client_1 = require("./client");
 const hash_1 = require("../lib/hash");
 const prisma_1 = require("../../generated/prisma");
 const seedSuperAdmin = () => __awaiter(void 0, void 0, void 0, function* () {
-    const adminEmail = 'admin@gclient.com';
-    const existingAdmin = yield client_1.prisma.user.findUnique({ where: { email: adminEmail } });
+    const adminEmail = "admin@gclient.com";
+    const existingAdmin = yield client_1.prisma.admin.findUnique({
+        where: { email: adminEmail },
+    });
     if (existingAdmin) {
         console.log(`✅ Admin user already exists: ${adminEmail}`);
         return;
     }
-    if (process.env.NODE_ENV !== 'development') {
+    if (process.env.NODE_ENV !== "development") {
         throw new Error("Seeding is only allowed in development");
     }
     const hashedPassword = yield (0, hash_1.hashPassword)(process.env.ADMIN_PASSWORD || "Admin@123");
-    yield client_1.prisma.user.create({
+    yield client_1.prisma.admin.create({
         data: {
-            firstName: 'System',
-            lastName: 'Admin',
+            firstName: "System",
+            lastName: "Admin",
             email: adminEmail,
-            passwordHash: hashedPassword,
+            password: hashedPassword,
             role: prisma_1.Role.SUPER_ADMIN,
             isVerified: true,
         },
     });
     console.log(`🎉 Admin user created: ${adminEmail}`);
+    // ✅ Seed Tracks
+    const tracks = yield client_1.prisma.track.createMany({
+        data: [
+            {
+                name: "Full Stack Development",
+                price: 1000,
+                duration: 4, //in weeks
+                instructor: "Salaam",
+                image: "null",
+                description: "Frontend and backend technologies",
+            },
+            {
+                name: "Data Science",
+                price: 1000,
+                duration: 8,
+                instructor: "Moham",
+                image: "null",
+                description: "Data analysis, ML, and statistics",
+            },
+            {
+                name: "UI/UX Design",
+                price: 1000,
+                duration: 6,
+                instructor: "Dabs",
+                image: "null",
+                description: "Design principles and tools",
+            },
+        ],
+    });
+    // ✅ Get inserted tracks
+    const allTracks = yield client_1.prisma.track.findMany();
+    // ✅ Seed Courses (linked to tracks)
+    for (const track of allTracks) {
+        yield client_1.prisma.course.createMany({
+            data: [
+                {
+                    title: `Intro to ${track.name}`,
+                    description: `Basic concepts in ${track.name}`,
+                    trackId: track.id,
+                    image: "",
+                },
+                {
+                    title: `Advanced ${track.name}`,
+                    description: `In-depth ${track.name} modules`,
+                    image: "",
+                    trackId: track.id,
+                },
+            ],
+        });
+    }
+    console.log("✅ Seed complete.");
 });
 seedSuperAdmin()
     .catch((e) => {
-    console.error('❌ Error seeding admin user:', e);
+    console.error("❌ Error seeding admin user:", e);
     process.exit(1);
 })
     .finally(() => __awaiter(void 0, void 0, void 0, function* () {

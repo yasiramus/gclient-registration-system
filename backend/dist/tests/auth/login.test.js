@@ -15,11 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const supertest_1 = __importDefault(require("supertest"));
 const app_1 = __importDefault(require("../../src/app"));
 const register_test_1 = require("./register.test");
-describe("POST /api/auth/login", () => {
+describe("POST /gclient/api/auth/login", () => {
     it("should log in a registered admin and return token", () => __awaiter(void 0, void 0, void 0, function* () {
         // Register admin first
         yield (0, supertest_1.default)(app_1.default)
-            .post("/api/auth/admin/register")
+            .post("/gclient/api/auth/admin/register")
             .set("Authorization", `Bearer ${process.env.SUPER_ADMIN_TOKEN}`)
             .send({
             firstName: "Yasira",
@@ -28,9 +28,7 @@ describe("POST /api/auth/login", () => {
             password: register_test_1.testPassword,
         });
         // Then login
-        const res = yield (0, supertest_1.default)(app_1.default)
-            .post("/api/auth/login")
-            .send({
+        const res = yield (0, supertest_1.default)(app_1.default).post("/gclient/api/auth/login").send({
             email: register_test_1.testEmail,
             password: register_test_1.testPassword,
         });

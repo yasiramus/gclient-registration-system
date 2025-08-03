@@ -1,52 +1,34 @@
 import { Request, Response } from "express";
 
-import z from "zod";
-
-import { coursesSchema } from "../schema";
+import { coursesSchema, updateCourseSchema } from "../schema/course.schema";
 import * as courseService from "../services/courses.service";
+import { parseZod } from "../middleware/validateRequest";
+import { sendResponse } from "../lib/sendResponse";
 
-export const createCourse = async (req: Request, res: Response) => {
-  try {
+export const createCourse = parseZod(
+  coursesSchema,
+  async (req: Request, res: Response) => {
     const data = {
       ...req.body,
       image: req?.file?.originalname,
     };
-    const parsed = coursesSchema.parse(data);
+    const course = await courseService.createCourse(data);
 
-    const newCourse = await courseService.createCourse(parsed);
-
-    return res.status(201).json({
-      success: true,
-      message: "Course created successfully",
-      data: newCourse,
+    return sendResponse(res, {
+      message: "Course created",
+      data: course,
+      statusCode: 201,
     });
-  } catch (error: any) {
-    console.error("Create Course Error:", error);
-    if (error instanceof z.ZodError)
-      return res.status(500).json({
-        success: false,
-        message: error.issues[0].message || "Failed to create course",
-      });
-
-    return res.status(501).json({ message: error });
   }
-};
+);
 
 export const getCourseById = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-
-    const course = await courseService.getCourseById(id);
-
-    if (!course) {
-      return res.status(404).json({ message: "Course not found" });
-    }
-
-    res.status(200).json(course);
-  } catch (error: any) {
-    console.error("Error retrieving course:", error);
-    res.status(500).json({ message: error.message || "Internal server error" });
-  }
+  const { id } = req.params;
+  const course = await courseService.getCourseById(id);
+  return sendResponse(res, {
+    message: "Course fetched",
+    data: course,
+  });
 };
 
 // const getAllCoursesNOPagination = async (_req: Request, res: Response) => {
@@ -62,63 +44,46 @@ export const getCourseById = async (req: Request, res: Response) => {
 
 /**with filters and pagination */
 export const getAllCourses = async (req: Request, res: Response) => {
-  try {
-    const { trackId, title, page = 1, limit = 10 } = req.query;
+  const { trackId, title, page = 1, limit = 10 } = req.query;
 
-    const filters = {
-      trackId: trackId ? String(trackId) : undefined,
-      title: title ? String(title) : undefined,
-      page: Number(page),
-      limit: Number(limit),
-    };
+  const filters = {
+    trackId: trackId ? String(trackId) : undefined,
+    title: title ? String(title) : undefined,
+    page: Number(page),
+    limit: Number(limit),
+  };
 
-    const result = await courseService.findAllWithFilters(filters);
+  const courses = await courseService.findAllWithFilters(filters);
 
-    res.status(200).json(result);
-  } catch (error) {
-    console.error("Error fetching courses:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
+  return sendResponse(res, {
+    message: "Courses fetched",
+    data: courses,
+  });
 };
 
-export const updateCourse = async (req: Request, res: Response) => {
-  try {
+export const updateCourse = parseZod(
+  updateCourseSchema,
+  async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    const { title, trackId, description } = req.body;
     const image = req.file?.filename as unknown as string;
 
-    const updated = await courseService.updateCourse(id, {
-      title,
-      trackId,
-      description,
-      image,
+    const data = {
+      ...req.body,
+      image: image || undefined,
+    };
+    const course = await courseService.updateCourse(id, data);
+
+    res.status(200).json(course);
+    return sendResponse(res, {
+      message: "Course updated",
+      data: course,
     });
-
-    if (!updated) {
-      return res.status(404).json({ message: "Course not found" });
-    }
-
-    res.status(200).json(updated);
-  } catch (error: any) {
-    console.error("Error updating course:", error);
-    res.status(500).json({ message: error.message || "Internal server error" });
   }
-};
+);
 
 export const deleteCourse = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-
-    const deleted = await courseService.deleteCourse(id);
-
-    if (!deleted) {
-      return res.status(404).json({ message: "Course not found" });
-    }
-
-    res.status(200).json({ message: "Course deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting course:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
+  const { id } = req.params;
+  await courseService.deleteCourse(id);
+  return sendResponse(res, { message: "Course deleted" });
 };
