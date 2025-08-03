@@ -12,6 +12,8 @@ import { upload } from "./middleware/upload.middleware";
 import { globalRateLimiter } from "./middleware/rate.limiter";
 import { cookie_session } from "./middleware/cookie_session.middleware";
 import invoiceRoute from "./routes/invoice.route";
+import { errorHandler } from "./middleware/errorHandler";
+import paymentRouter from "./routes/payment.route";
 
 const app = express();
 const mainRouter = express.Router(); //main router
@@ -20,7 +22,6 @@ const mainRouter = express.Router(); //main router
 dbConnection();
 
 /*basic middleware */
-app.use(express.json());
 app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -36,6 +37,10 @@ app.use(helmet());
 app.use(cookie_session);
 app.use(globalRateLimiter);
 
+app.use("/initiate", paymentRouter);
+
+app.use(express.json());
+
 app.use(upload.single("image"));
 
 app.use("/gclient/api", mainRouter); //main router entry
@@ -45,7 +50,10 @@ mainRouter.use("/auth", authRoute);
 mainRouter.use("/tracks", trackRoute);
 mainRouter.use("/courses", coursesRoute);
 mainRouter.use("/learners", learnerRoute);
-mainRouter.use("/invoice", invoiceRoute);
+mainRouter.use("/invoices", invoiceRoute);
+
+// global error handler middleware
+app.use(errorHandler);
 
 app.get("/", (req, res) => {
   res.send("Welcome to the GClient Registration System API");

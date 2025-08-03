@@ -29,8 +29,8 @@ export const getTrackById = async (id: string) => {
     where: { id },
     include: { courses: true },
   });
-  if (findTrack) return findTrack;
-  throw new Error("No track found");
+  if (!findTrack) throw new Error("No track found");
+  return findTrack;
 };
 
 export const updateTrack = async (id: string, data: Partial<Track>) => {

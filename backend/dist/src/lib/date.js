@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateExpirationDate = void 0;
 // expiration date for verification codes
+//by default set to 24 hours 1day
 const generateExpirationDate = (hours = 24, minutes = 0) => {
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + hours);

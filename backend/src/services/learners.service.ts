@@ -2,21 +2,27 @@ import { prisma } from "../db/client";
 
 import { LearnerFilters } from "../interfaces/learners.int";
 
+export const createLearner = async (data: any) => {
+  return await prisma.learner.create({
+    data,
+  });
+};
+
 /**retrieve learners with optional filters */
 export const getAllLearners = async (filters: LearnerFilters) => {
-  const { trackId, courseId, paymentStatus } = filters;
+  const { trackId, courseId } = filters;
 
   return await prisma.learner.findMany({
     where: {
       AND: [
         trackId ? { trackId } : {},
         courseId ? { courseId } : {},
-        paymentStatus ? { paymentStatus } : {},
+        // paymentStatus ? { paymentStatus } : {},
       ],
     },
     include: {
-      track: true,
-      course: true,
+      enrolledTrack: true,
+      enrolledCourse: true,
       invoices: true,
     },
   });
@@ -27,8 +33,8 @@ export const getLearnerById = async (id: string) => {
   const learner = await prisma.learner.findUnique({
     where: { id },
     include: {
-      track: true,
-      course: true,
+      enrolledTrack: true,
+      enrolledCourse: true,
       invoices: true,
     },
   });

@@ -16,7 +16,7 @@ datasource db {
 
 enum Role {
   ADMIN
-  LEARNER
+  // LEARNER
   SUPER_ADMIN
 }
 
@@ -31,55 +31,71 @@ enum PaymentStatus {
   PENDING
 }
 
-model User {
-  id           String   @id @default(uuid())
-  firstName    String
-  lastName     String
-  email        String   @unique
-  passwordHash String
-  role         Role     @default(LEARNER)
-  isVerified   Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+model Admin {
+  id         String   @id @default(uuid())
+  firstName  String
+  lastName   String
+  email      String   @unique
+  password   String
+  role       Role     @default(ADMIN)
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   // Relations
   verificationTokens VerificationToken[] // one-to-many
+}
+
+model Learner {
+  id             String    @id @default(uuid())
+  firstName      String
+  lastName       String
+  email          String    @unique
+  password       String?
+  enrolledTrack  Track?    @relation(fields: [trackId], references: [id])
+  trackId        String
+  enrolledCourse Course?   @relation(fields: [courseId], references: [id])
+  courseId       String?
+  // paymentStatus  PaymentStatus @default(PENDING)
+  invoices       Invoice[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 model VerificationToken {
   id        String           @id @default(uuid())
   type      VerificationType
   token     String           @unique
-  userId    String
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  adminId   String
+  admin     Admin            @relation(fields: [adminId], references: [id], onDelete: Cascade)
   createdAt DateTime         @default(now())
   expiresAt DateTime
   usedAt    DateTime? //null= not used
 
-  @@index([userId, createdAt], name: "idx_verification_user_created")
+  @@index([adminId, createdAt], name: "idx_verification_user_created")
 }
 
 model Track {
   id          String    @id @default(uuid())
   name        String    @unique
   price       Decimal   @db.Decimal(10, 2)
-  duration    String
+  duration    Int //in weeks
   instructor  String
-  description String
-  image       String
+  description String?
+  image       String?
   courses     Course[]
-  learner     Learner[]
+  learners    Learner[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
 
 model Course {
   id          String    @id @default(uuid())
-  trackId     String
   title       String
-  description String
+  description String?
   image       String
-  track       Track     @relation(fields: [trackId], references: [id])
+  track       Track?    @relation(fields: [trackId], references: [id])
+  trackId     String
   learner     Learner[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -87,29 +103,16 @@ model Course {
   @@index([trackId])
 }
 
-model Learner {
-  id            String        @id @default(uuid())
-  firstName     String
-  lastName      String
-  email         String        @unique
-  password      String
-  trackId       String
-  courseId      String
-  paymentStatus PaymentStatus @default(PENDING)
-  invoices      Invoice[]
-  track         Track         @relation(fields: [trackId], references: [id])
-  course        Course        @relation(fields: [courseId], references: [id])
-  createdAt     DateTime      @default(now())
-}
-
 model Invoice {
   id         String        @id @default(uuid())
+  learner    Learner       @relation(fields: [learnerId], references: [id])
   learnerId  String
   amountPaid Float
-  status     PaymentStatus
-  dueAmount  Float
-  learner    Learner       @relation(fields: [learnerId], references: [id])
+  status     PaymentStatus @default(PENDING)
+  // dueAmount  Float
+  dueDate    DateTime?
   createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
 
   @@index([learnerId])
 }

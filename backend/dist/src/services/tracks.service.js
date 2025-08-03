@@ -18,7 +18,7 @@ const createTrack = (data) => __awaiter(void 0, void 0, void 0, function* () {
         },
     });
     if (existingTrack)
-        throw new Error("Duplicate tack name");
+        throw new Error("Track name already exists");
     return yield client_1.prisma.track.create({ data });
 });
 exports.createTrack = createTrack;
@@ -36,9 +36,9 @@ const getTrackById = (id) => __awaiter(void 0, void 0, void 0, function* () {
         where: { id },
         include: { courses: true },
     });
-    if (findTrack)
-        return findTrack;
-    throw new Error("No track found");
+    if (!findTrack)
+        throw new Error("No track found");
+    return findTrack;
 });
 exports.getTrackById = getTrackById;
 const updateTrack = (id, data) => __awaiter(void 0, void 0, void 0, function* () {
@@ -60,6 +60,6 @@ const deleteTrack = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const record = yield client_1.prisma.track.delete({ where: { id } });
     if (!record)
         throw new Error(" No record was found for a delete");
-    return record;
+    return `${record.name} has been removed from tracks`;
 });
 exports.deleteTrack = deleteTrack;

@@ -25,7 +25,7 @@ describe("POST /gclient/api/auth/admin/register", () => {
   });
 
   afterAll(async () => {
-    await prisma.user.deleteMany({
+    await prisma.admin.deleteMany({
       where: {
         role: Role.ADMIN,
       },
@@ -58,7 +58,7 @@ describe("POST /gclient/api/auth/admin/register", () => {
   });
 
   // it("should return 400 if email already exists", async () => {
-  //     // First register a user
+  //     // First register a admin
   //     await request(app).post("/api/auth/admin/register").send({
   //         firstName: "Jane",
   //         lastName: "Doe",

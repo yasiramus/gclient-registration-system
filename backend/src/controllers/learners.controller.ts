@@ -1,24 +1,35 @@
 import { Request, Response } from "express";
 import * as learners from "../services/learners.service";
+import { parseZod } from "../middleware/validateRequest";
+import { CreateLearnerSchema } from "../schema/learner.schema";
+import { sendResponse } from "../lib/sendResponse";
+
+export const createLearner = parseZod(
+  CreateLearnerSchema,
+  async (req: Request, res: Response) => {
+    const learner = await learners.createLearner(req.body);
+    return sendResponse(res, {
+      message: "Learner created",
+      data: learner,
+      statusCode: 201,
+    });
+  }
+);
 
 /**get all learners with filters or not */
 export const fetchLearners = async (req: Request, res: Response) => {
-  try {
-    const { trackId, courseId, paymentStatus } = req.query;
+  const { trackId, courseId } = req.query;
 
-    const learner = await learners.getAllLearners({
-      trackId: trackId?.toString(),
-      courseId: courseId?.toString(),
-      paymentStatus: paymentStatus?.toString() as "FULL" | "PARTIAL",
-    });
+  const learner = await learners.getAllLearners({
+    trackId: trackId?.toString(),
+    courseId: courseId?.toString(),
+    // paymentStatus: paymentStatus?.toString() as "FULL" | "PARTIAL",
+  });
 
-    res.status(200).json({ success: true, data: learner });
-  } catch (error) {
-    console.error("Error fetching learners:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Failed to fetch learners." });
-  }
+  return sendResponse(res, {
+    message: "Learners fetched",
+    data: learner,
+  });
 };
 
 /**get a specific learner using the id */
