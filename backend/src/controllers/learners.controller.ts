@@ -1,7 +1,10 @@
 import { Request, Response } from "express";
 import * as learners from "../services/learners.service";
 import { parseZod } from "../middleware/validateRequest";
-import { CreateLearnerSchema } from "../schema/learner.schema";
+import {
+  CreateLearnerSchema,
+  getLearnersQuerySchema,
+} from "../schema/learner.schema";
 import { sendResponse } from "../lib/sendResponse";
 
 export const createLearner = parseZod(
@@ -16,14 +19,29 @@ export const createLearner = parseZod(
   }
 );
 
-/**get all learners with filters or not */
+/**
+ This function retrieves all learners based on optional filters such as trackId, courseId, and paymentStatus.
+ IT accepts query parameters and validates them against the `getLearnersQuerySchema`.
+ it can also be used without the filters to fetch all learners.
+ * *  */
 export const fetchLearners = async (req: Request, res: Response) => {
-  const { trackId, courseId } = req.query;
+  const queries = {
+    ...req.query,
+    paymentStatus: req.query.paymentStatus
+      ? req.query.paymentStatus.toString().toUpperCase()
+      : undefined,
+  };
+  const parseResult = getLearnersQuerySchema.parse(queries);
+  if (!parseResult) {
+    return res.status(400).json({ error: parseResult });
+  }
+
+  const { trackId, courseId, paymentStatus } = parseResult;
 
   const learner = await learners.getAllLearners({
-    trackId: trackId?.toString(),
-    courseId: courseId?.toString(),
-    // paymentStatus: paymentStatus?.toString() as "FULL" | "PARTIAL",
+    trackId,
+    courseId,
+    paymentStatus,
   });
 
   return sendResponse(res, {

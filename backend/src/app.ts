@@ -23,6 +23,7 @@ dbConnection();
 
 /*basic middleware */
 app.use(morgan("dev"));
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
@@ -36,11 +37,9 @@ app.use(helmet());
 
 app.use(cookie_session);
 app.use(globalRateLimiter);
+app.use(upload.single("image"));
 
 app.use("/gclient/api", mainRouter); //main router entry
-mainRouter.use("/initiate", paymentRouter);
-app.use(express.json());
-app.use(upload.single("image"));
 
 //all routes mount under gclient/v1/api
 mainRouter.use("/auth", authRoute);
@@ -48,6 +47,11 @@ mainRouter.use("/tracks", trackRoute);
 mainRouter.use("/courses", coursesRoute);
 mainRouter.use("/learners", learnerRoute);
 mainRouter.use("/invoices", invoiceRoute);
+mainRouter.use(
+  "/initiate",
+  // express.raw({ type: "application/json" }), // required by Paystack
+  paymentRouter
+);
 
 // global error handler middleware
 app.use(errorHandler);

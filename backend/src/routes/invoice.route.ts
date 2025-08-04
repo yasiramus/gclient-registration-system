@@ -1,7 +1,11 @@
 import { Router } from "express";
 
 import { Role } from "../../generated/prisma";
-import { createInvoice } from "../controllers/invoice.controller";
+import {
+  createInvoice,
+  getAllInvoices,
+  getInvoicesByLearner,
+} from "../controllers/invoice.controller";
 import { authorizeRoles, requireAuth } from "../middleware/auth.middleware";
 
 const invoiceRoute = Router();
@@ -9,6 +13,7 @@ const invoiceRoute = Router();
 invoiceRoute.use(requireAuth);
 invoiceRoute.use(authorizeRoles(Role.SUPER_ADMIN || Role.ADMIN));
 
-invoiceRoute.post("/", createInvoice);
+invoiceRoute.get("/", getAllInvoices);
+invoiceRoute.get("/:learnerId", getInvoicesByLearner); // /api/invoices/:learnerId
 
 export default invoiceRoute;
