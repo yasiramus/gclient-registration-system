@@ -53,4 +53,4 @@ export const verifyTransaction = async (reference: string) => {
   console.log("verifyTransaction response: ", response.data);
   return response.data;
 };
-verifyTransaction("w7nisvz2cd");
+// verifyTransaction("w7nisvz2cd");

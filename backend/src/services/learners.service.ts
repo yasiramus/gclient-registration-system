@@ -10,15 +10,19 @@ export const createLearner = async (data: any) => {
 
 /**retrieve learners with optional filters */
 export const getAllLearners = async (filters: LearnerFilters) => {
-  const { trackId, courseId } = filters;
+  const { trackId, courseId, paymentStatus } = filters;
 
-  return await prisma.learner.findMany({
+  const learners = await prisma.learner.findMany({
     where: {
-      AND: [
-        trackId ? { trackId } : {},
-        courseId ? { courseId } : {},
-        // paymentStatus ? { paymentStatus } : {},
-      ],
+      ...(trackId && { trackId }),
+      ...(courseId && { courseId }),
+      ...(paymentStatus && {
+        invoices: {
+          some: {
+            status: paymentStatus,
+          },
+        },
+      }),
     },
     include: {
       enrolledTrack: true,
@@ -26,6 +30,29 @@ export const getAllLearners = async (filters: LearnerFilters) => {
       invoices: true,
     },
   });
+
+  const filtered = learners
+    .map((learner) => {
+      if (!learner.invoices.length) return null;
+
+      // Find the latest invoice that matches the status
+      const latestMatchingInvoice = learner.invoices
+        .filter(({ status }) => status === paymentStatus)
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )[0];
+
+      if (!latestMatchingInvoice) return null;
+
+      return {
+        ...learner,
+        invoices: [latestMatchingInvoice],
+      };
+    })
+    .filter(Boolean); // remove nulls
+
+  return paymentStatus ? filtered : learners;
 };
 
 /**retrieve a single learner */

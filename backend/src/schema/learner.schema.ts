@@ -8,3 +8,9 @@ export const CreateLearnerSchema = z.object({
   trackId: z.uuid().optional(),
   courseId: z.uuid().optional(),
 });
+
+export const getLearnersQuerySchema = z.object({
+  trackId: z.string().optional(),
+  courseId: z.string().optional(),
+  paymentStatus: z.enum(["PAID", "PARTIAL", "PENDING"]).optional(),
+});
