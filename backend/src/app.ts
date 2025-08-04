@@ -8,12 +8,12 @@ import authRoute from "./routes/auth.route";
 import trackRoute from "./routes/tracks.route";
 import learnerRoute from "./routes/learner.route";
 import coursesRoute from "./routes/courses.route";
+import invoiceRoute from "./routes/invoice.route";
+import paymentRouter from "./routes/payment.route";
 import { upload } from "./middleware/upload.middleware";
+import { errorHandler } from "./middleware/errorHandler";
 import { globalRateLimiter } from "./middleware/rate.limiter";
 import { cookie_session } from "./middleware/cookie_session.middleware";
-import invoiceRoute from "./routes/invoice.route";
-import { errorHandler } from "./middleware/errorHandler";
-import paymentRouter from "./routes/payment.route";
 
 const app = express();
 const mainRouter = express.Router(); //main router
@@ -37,13 +37,10 @@ app.use(helmet());
 app.use(cookie_session);
 app.use(globalRateLimiter);
 
-app.use("/initiate", paymentRouter);
-
-app.use(express.json());
-
-app.use(upload.single("image"));
-
 app.use("/gclient/api", mainRouter); //main router entry
+mainRouter.use("/initiate", paymentRouter);
+app.use(express.json());
+app.use(upload.single("image"));
 
 //all routes mount under gclient/v1/api
 mainRouter.use("/auth", authRoute);

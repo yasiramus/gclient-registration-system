@@ -1,7 +1,6 @@
 import { Response, Request } from "express";
 
 import { prisma } from "../db/client";
-import { sendResponse } from "../lib/sendResponse";
 import { initializeTransaction } from "../lib/paystack";
 import { parseZod } from "../middleware/validateRequest";
 import { PaymentSchema } from "../schema/invoice.schema";
@@ -28,9 +27,6 @@ export const initiatePayment = parseZod(
       metadata: { learnerId },
     };
     const data = await initializeTransaction(transactionData);
-    return sendResponse(res, {
-      message: "Payment initialization successful.",
-      data: data,
-    });
+    return res.status(200).json(data);
   }
 );
