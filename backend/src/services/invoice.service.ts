@@ -20,9 +20,12 @@ export const createInvoice = async (data: {
   const existing = await prisma.invoice.findFirst({
     where: {
       learnerId,
-      createdAt: { gte: new Date(Date.now() - 5 * 60 * 1000) },
+      AND: {
+        status: "PAID",
+      },
     },
   });
+  console.log("Existing invoice: ", existing);
   if (existing) throw new Error("Already processed");
 
   const coursePrice = Number(learner.enrolledTrack.price);
