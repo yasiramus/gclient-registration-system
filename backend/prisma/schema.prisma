@@ -60,25 +60,55 @@ model VerificationToken {
 }
 
 model Track {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  price       Decimal  @db.Decimal(10, 2)
+  id          String    @id @default(uuid())
+  name        String    @unique
+  price       Decimal   @db.Decimal(10, 2)
   duration    String
   instructor  String
   description String
   courses     Course[]
+  learner     Learner[]
   image       String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Course {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   trackId     String
   title       String
   description String
   image       String
-  track       Track    @relation(fields: [trackId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  track       Track     @relation(fields: [trackId], references: [id])
+  learner     Learner[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([trackId])
+}
+
+// prisma/schema.prisma
+model Learner {
+  id            String        @id @default(uuid())
+  name          String
+  email         String        @unique
+  trackId       String
+  courseId      String
+  paymentStatus PaymentStatus @default(NONE)
+  invoices      Invoice[]
+  track         Track         @relation(fields: [trackId], references: [id])
+  course        Course        @relation(fields: [courseId], references: [id])
+  createdAt     DateTime      @default(now())
+}
+
+model Invoice {
+  id          String        @id @default(uuid())
+  learnerId   String
+  amountPaid  Float
+  paymentType PaymentStatus
+  dueAmount   Float
+  createdAt   DateTime      @default(now())
+  learner     Learner       @relation(fields: [learnerId], references: [id])
+
+  @@index([learnerId])
 }
