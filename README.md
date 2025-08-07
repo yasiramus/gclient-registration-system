@@ -39,13 +39,31 @@ This is the backend service for **G-client**, a student management platform buil
 
   <!-- Week 4  -->
 
-- 📊**Reports system**
+- 🔐 **Admin Profile Management**
 
-  - Total Learners : Returns the count of all registered learners.
-  - Total Income — Calculates total amount paid across all invoices.
-  - Income per Track — Groups total income by each track (UI/UX, Data, etc).
+  - Admins can now update their profile information (first name, last name, email).
+
+  - Session-based authentication is implemented using cookie-session. The id and role are securely stored in the session cookie.
+
+  - Middleware protection ensures only logged-in admins can access protected routes.
+
+  - Request payloads are validated using Zod, with strict checks to ensure at least one field is provided during updates and also check for using an old email.
+
+  - Attempts to update with empty data are gracefully handled with meaningful error messages.
+  - Update with an old email are gracefully handled with meaningful error messages.
+
+- 📊 **Report Endpoints**
+
+  - Total Learners: Returns the total number of registered learners.
+
+  - Total Income: Sums all amountPaid values from invoices with status PAID.
+
+  - Income Per Track: Groups total income based on each learner’s enrolled track.
+
+  These updates improve data integrity, security, and provide valuable insights via reporting.
 
 - 🧪 **Robust Validation & Testing**
+
   - Validates request payloads using Zod.
   - Includes automated test cases for critical endpoints.
 
@@ -151,12 +169,12 @@ Runs on `http://localhost:5000`
 
 ---
 
-## 🔁 Simulating Paystack Webhooks
+## 🔁 Simulating Pay stack Webhooks
 
 1. Use your local or deployed webhook URL:
 
    ```
-   POST /api/paystack/webhook
+   POST /api/pay stack/webhook
    ```
 
 2. Example Payload:
@@ -177,7 +195,7 @@ Runs on `http://localhost:5000`
 
 3. Set Headers in Postman:
 
-- `x-paystack-signature`: (mocked or real if verifying)
+- `x-pay stack-signature`: (mocked or real if verifying)
 - `Content-Type`: `application/json`
 
 ---

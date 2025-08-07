@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { prisma } from "../db/client";
 
 import { sendResponse } from "../lib/sendResponse";
-import { incomePerInvoice, incomePerTrack } from "../services/report.services";
+import { incomePerInvoice, incomePerTrack } from "../services/report.service";
 
 //Returns the total number of registered learners
 export const getTotalLearners = async (_req: Request, res: Response) => {
