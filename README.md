@@ -1,6 +1,6 @@
 # 🧠 G-client Backend
 
-This is the backend service for **G-client**, a student management platform built with scalability, security, and maintainability in mind. It powers core features such as learner registration, invoicing, and payment processing.
+This is the backend service for **G-client**, a student management platform built with scalability, security, and maintainability in mind. It powers core features such as Admin and learner registration, Tracks, Courses, invoicing, payment processing and admin info.
 
 ---
 
@@ -9,7 +9,7 @@ This is the backend service for **G-client**, a student management platform buil
 - 🔐 **Authentication & Authorization**
 
   - Super Admin can create other Admins.
-  - Login and protected routes using JWT stored in secure HttpOnly cookies.
+  - Login and protected routes using JWT stored in secure HttpOnly cookies session.
   - Admin middleware to restrict access to critical endpoints.
 
 - 👨‍🎓 **Learner Management**
@@ -161,7 +161,7 @@ Runs on `http://localhost:5000`
 
 ## 🧪 API Testing
 
-- Base URL: `http://localhost:5000/api`
+- Base URL: `http://localhost:5000/gclient/api/admin`
 - Import the Postman collection:
   [`G-client.postman_collection.json`](./public/G-client.postman_collection.json)
 
