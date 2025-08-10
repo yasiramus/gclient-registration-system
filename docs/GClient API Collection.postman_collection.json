@@ -1,0 +1,1172 @@
+{
+	"info": {
+		"_postman_id": "42f9a700-acec-42e2-b00b-c38a2d7b627b",
+		"name": "GClient API Collection",
+		"description": "Collection for testing GClient API with cookie-session auth.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12324834"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register Admin",
+					"protocolProfileBehavior": {
+						"followAuthorizationHeader": true,
+						"insecureHTTPParser": false
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "yasira6@gclient.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "admin12345",
+									"type": "text"
+								},
+								{
+									"key": "firstName",
+									"value": "Ayisha",
+									"type": "text"
+								},
+								{
+									"key": "lastName",
+									"value": "Musah",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{local}}/auth/admin/register",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"auth",
+								"admin",
+								"register"
+							]
+						},
+						"description": "## Admin Registration Endpoint\n\nThis endpoint allows an administrator(super admin) to register a new user(admin) by providing the necessary user details.\n\n### Request\n\n**Method:** POST  \n**URL:** `{{local}}/auth/admin/register`\n\n#### Request Body (form-data)\n\n- **email** (string): The email address of the user to be registered.\n    \n- **password** (string): The password for the new user account.\n    \n- **firstName** (string): The first name of the user.\n    \n- **lastName** (string): The last name of the user.\n    \n\n### Response\n\n**Status Code:** 401  \n**Content-Type:** application/json\n\n#### Response Body\n\n- **message** (string): A message indicating the result of the registration attempt. A 401 status typically indicates that the request was unauthorized, which may occur if the provided credentials or data are invalid.\n    \n\n### Notes\n\n- Ensure that all required fields are filled out correctly before making the request.\n    \n- A successful registration will return a different 201 status code, message and the user's data, while a 401 status indicates an issue with the provided data."
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Email",
+					"protocolProfileBehavior": {
+						"followAuthorizationHeader": true,
+						"insecureHTTPParser": false
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "code",
+									"value": "220029",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "yasira@gclient.com",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{local}}/auth/verify-email",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"auth",
+								"verify-email"
+							]
+						},
+						"description": "## Verify Email Endpoint\n\nThis endpoint allows users to verify their email address by providing a verification code.\n\n### Request\n\n**Method:** POST  \n**URL:** `{{local}}/auth/verify-email`\n\n#### Request Body (form-data)\n\n- **code** (string): The verification code sent to the user's email address.\n    \n\n### Response\n\n**Status Code:** 200  \n**Content-Type:** application/json\n\n#### Response Body\n\n- **success** (boolean): Indicates whether the email verification was successful.\n    \n- **message** (string): A message providing additional information about the verification process.\n    \n- **data** (object): Contains user-related information upon successful verification.\n    \n    - **id** (string): The unique identifier of the user.\n        \n    - **role** (string): The role assigned to the user.\n        \n\n### Notes\n\n- Ensure that the verification code is accurate and corresponds to the email address used during registration.\n    \n- A successful verification will return a 200 status code along with a success message and user data.\n    \n- Error responses may include different status codes and messages indicating issues with the verification process."
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "admin@gclient.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "admin1234",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{local}}/auth/login",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "### Login Endpoint\n\nThis endpoint is used to authenticate users by logging them into the application. It accepts user credentials and returns a success message upon successful authentication.\n\n#### Request\n\n**Method:** POST  \n**URL:** `{{local}}/auth/login`\n\n**Request Body (x-www-form-urlencoded):**\n\n- `email` (string): The email address of the user attempting to log in.\n    \n- `password` (string): The password associated with the user's account.\n    \n\n#### Response\n\n**Status Code:** 200  \n**Content-Type:** application/json\n\n**Response Body:**\n\n- `message` (string): A message indicating the result of the login attempt. This will typically confirm successful login.\n    \n\nEnsure that the email and password provided in the request body are correct to receive a successful response."
+					},
+					"response": []
+				},
+				{
+					"name": "Request Verification",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/auth/request-verification/:email",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"auth",
+								"request-verification",
+								":email"
+							],
+							"variable": [
+								{
+									"key": "email",
+									"value": "yasira@gclient.com"
+								}
+							]
+						},
+						"description": "## Request Description\n\nThis endpoint is a **GET** request used to initiate a verification process for a user based on their email address. The user must provide their email as a URL parameter in the request.\n\n### Parameters\n\n- `email` (path parameter): The email address of the user for whom the verification request is being made. This should be a valid email format.\n    \n\n### Response\n\nThe response will return a JSON object. In the case of a successful request, it will typically contain a success, message and status. However, if there is an error, as indicated by a status code of 500, the response may include an error message.\n\n### Note\n\nNo form data is involved in this request; all necessary information is passed through the URL.\n\nThis endpoint is used to initiate a request for verification based on the provided email address. It is typically used in scenarios where a user needs to verify their identity or confirm their email address."
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/auth/forgot-password/:email",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"auth",
+								"forgot-password",
+								":email"
+							],
+							"variable": [
+								{
+									"key": "email",
+									"value": "yasira6@gclient.com"
+								}
+							]
+						},
+						"description": "### Forgot Password Endpoint\n\nThis endpoint is used to initiate the password recovery process for a user by sending a password reset link to the provided email address.\n\n#### Request\n\n- **Method:** GET\n    \n- **URL:** `{{local}}/auth/forgot-password/:email`\n    \n- **Path Parameter:**\n    \n    - `email` (string): The email address of the user who has forgotten their password. This parameter is required and should be URL-encoded if it contains special characters.\n        \n\n#### Response\n\nUpon a successful request, the API will return a JSON response with the following structure:\n\n- **success** (boolean): Indicates whether the request was successful.\n    \n- **message** (string): A message providing additional information about the request. This may be empty.\n    \n\n#### Example Response\n\n``` json\n{\n  \"success\": true,\n  \"message\": \"\"\n}\n\n ```\n\nThis response signifies that the password reset link has been successfully sent to the provided email address."
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "newPassword",
+									"value": "admin1234",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{local}}/auth/reset-password/:email",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"auth",
+								"reset-password",
+								":email"
+							],
+							"variable": [
+								{
+									"key": "email",
+									"value": "yasira6@gclient.com"
+								}
+							]
+						},
+						"description": "## Reset Password Endpoint\n\nThis endpoint allows users to reset their password by providing a new password associated with their email address. It is essential for maintaining account security and ensuring that users can regain access to their accounts.\n\n### Request\n\n- **Method**: POST\n    \n- **URL**: `{{local}}/auth/reset-password/:email`\n    \n\n#### Request Body\n\nThe request must include the following parameter in the body, formatted as `x-www-form-urlencoded`:\n\n- **newPassword** (string): The new password that the user wishes to set for their account. This parameter is required.\n    \n\n### Response\n\nOn successful execution, the endpoint will return a response with the following structure:\n\n- **Status**: 200 OK\n    \n- **Content-Type**: application/json\n    \n\n#### Response Body\n\nThe response will contain a JSON object with the following fields:\n\n- **success** (boolean): Indicates whether the password reset operation was successful.\n    \n- **message** (string): A message providing additional information about the operation.\n    \n\n### Example\n\n#### Request\n\n```\nPOST {{local}}/auth/reset-password/user@example.com\nContent-Type: application/x-www-form-urlencoded\nnewPassword=myNewPassword123\n\n ```\n\n#### Response\n\n``` json\n{\n  \"success\": true,\n  \"message\": \"\"\n}\n\n ```\n\nThis endpoint is crucial for users who need to update their passwords securely."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tracks",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Cybersecurity1960",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "400",
+									"type": "text"
+								},
+								{
+									"key": "duration",
+									"value": "10",
+									"type": "text"
+								},
+								{
+									"key": "instructor",
+									"value": "Timothy",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Security principles",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "postman-cloud:///1f06edb0-12ee-48b0-918f-e6ddfc73fac7"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{local}}/tracks",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"tracks"
+							]
+						},
+						"description": "## Add Track\n\nThis endpoint allows you to add a new track to the system. It accepts a POST request to the specified endpoint.\n\n### Request\n\n**Method:** POST  \n**Endpoint:** `{{local}}/tracks`\n\n#### Request Body (form-data)\n\n- **name** (text): The name of the track.\n    \n- **price** (text): The price of the track.\n    \n- **duration** (text): The duration of the track.\n    \n- **instructor** (text): The name of the instructor for the track.\n    \n- **description** (text): A brief description of the track.\n    \n- **image** (file): An optional image file associated with the track.\n    \n\n### Response\n\nOn a successful request, the API will return a response with a status code of **201 Created**. The response will be in JSON format and will include the following structure:\n\n- **success** (boolean): Indicates whether the request was successful.\n    \n- **message** (string): A message providing additional information about the request.\n    \n- **data** (object): Contains the details of the created track:\n    \n    - **id** (string): The unique identifier for the track.\n        \n    - **name** (string): The name of the track.\n        \n    - **price** (string): The price of the track.\n        \n    - **duration** (string): The duration of the track.\n        \n    - **instructor** (string): The name of the instructor.\n        \n    - **description** (string): The description of the track.\n        \n    - **image** (string): The URL or path to the associated image.\n        \n    - **createdAt** (string): Timestamp of when the track was created.\n        \n    - **updatedAt** (string): Timestamp of when the track was last updated.\n        \n\nEnsure that all required fields are provided in the request body for successful track creation."
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Cybersecurity 001",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "1000 ",
+									"type": "text"
+								},
+								{
+									"key": "duration",
+									"value": "12",
+									"type": "text"
+								},
+								{
+									"key": "instructor",
+									"value": "Salaam Moha",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Security principles",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "postman-cloud:///1f06ee30-99fe-4230-823b-65a0636d42c7",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{local}}/tracks/:id",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"tracks",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "24a2dae9-f3b8-4262-bc02-d4b2db452ade"
+								}
+							]
+						},
+						"description": "## Update Track\n\nThis endpoint allows you to update an existing track in the system. It accepts a PUT request to the specified endpoint.\n\n### Request\n\n**Method:** PUT  \n**Endpoint:** `{{local}}/tracks/:id`\n\n#### Request Body (form-data)\n\n- **name** (text): The name of the track.\n    \n- **price** (text): The price of the track.\n    \n- **duration** (text): The duration of the track.\n    \n- **instructor** (text): The name of the instructor for the track.\n    \n- **description** (text): A brief description of the track.\n    \n\n### Response\n\nOn a successful request, the API will return a response with a status code of **200 OK**. The response will be in JSON format and will include the following structure:\n\n- **message** (string): A message providing additional information about the request.\n    \n- **data** (object): Contains the details of the updated track:\n    \n    - **id** (string): The unique identifier for the track.\n        \n    - **name** (string): The name of the track.\n        \n    - **price** (string): The price of the track.\n        \n    - **duration** (string): The duration of the track.\n        \n    - **instructor** (string): The name of the instructor.\n        \n    - **description** (string): The description of the track.\n        \n    - **image** (string): The URL or path to the associated image.\n        \n    - **createdAt** (string): Timestamp of when the track was created.\n        \n    - **updatedAt** (string): Timestamp of when the track was last updated.\n        \n\nEnsure that all required fields are provided in the request body for successful track update."
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{local}}/tracks",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"tracks"
+							]
+						},
+						"description": "## Get Tracks\n\nThis endpoint retrieves a list of tracks available in the system. It is a simple HTTP GET request that does not require any request body.\n\n### Request Format\n\n- **Method**: GET\n    \n- **URL**: `{{local}}/tracks`\n    \n\n### Response Format\n\nUpon a successful request, the server responds with a status code of 200 and returns a JSON array containing the following fields for each track:\n\n- **id**: (string) Unique identifier for the track.\n    \n- **name**: (string) Name of the track.\n    \n- **price**: (string) Price of the track.\n    \n- **duration**: (string) Duration of the track.\n    \n- **instructor**: (string) Name of the instructor for the track.\n    \n- **description**: (string) Description of the track.\n    \n- **image**: (string) URL to the image associated with the track.\n    \n- **createdAt**: (string) Timestamp of when the track was created.\n    \n- **updatedAt**: (string) Timestamp of the last update to the track.\n    \n- **courses**: (array) List of courses associated with the track.\n    \n\n### Example Response\n\n``` json\n[\n    {\n        \"id\": \"\",\n        \"name\": \"\",\n        \"price\": \"\",\n        \"duration\": \"\",\n        \"instructor\": \"\",\n        \"description\": \"\",\n        \"image\": \"\",\n        \"createdAt\": \"\",\n        \"updatedAt\": \"\",\n        \"courses\": []\n    }\n]\n\n ```\n\nThis endpoint is useful for fetching all available tracks, which can be displayed to users or used for further processing."
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch BY Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{local}}/tracks/:id",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"tracks",
+								":id"
+							],
+							"query": [
+								{
+									"key": null,
+									"value": "",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "24a2dae9-f3b8-4262-bc02-d4b2db452ade"
+								}
+							]
+						},
+						"description": "## Get Track Details\n\nThis endpoint retrieves detailed information about a specific track based on its unique identifier.\n\n### Request\n\n- **Method**: `GET`\n    \n- **Endpoint**: `{{local}}/tracks/:id`\n    \n- **Path Parameter**:\n    \n    - `id` (string): The unique identifier of the track you wish to retrieve.\n        \n\n### Response\n\n- **Status Code**: `200 OK`\n    \n- **Content-Type**: `application/json`\n    \n- **Response Body**:\n    \n    - `id` (string): The unique identifier of the track.\n        \n    - `name` (string): The name of the track.\n        \n    - `price` (string): The price of the track.\n        \n    - `duration` (string): The duration of the track.\n        \n    - `instructor` (string): The instructor associated with the track.\n        \n    - `description` (string): A brief description of the track.\n        \n    - `image` (string): A URL to an image representing the track.\n        \n    - `createdAt` (string): The timestamp when the track was created.\n        \n    - `updatedAt` (string): The timestamp when the track was last updated.\n        \n    - `courses` (array): A list of courses associated with the track.\n        \n\nThis endpoint provides a comprehensive overview of the track, including its metadata and related courses."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{local}}/tracks/:id",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"tracks",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "24a2dae9-f3b8-4262-bc02-d4b2db452ade"
+								}
+							]
+						},
+						"description": "## DELETE /tracks/:id\n\nThis endpoint is used to delete a specific track identified by its unique ID.\n\n### Request Parameters\n\n- **id** (path parameter): The unique identifier of the track that you wish to delete. This parameter is required.\n    \n\n### Response\n\nUpon successful deletion of the track, the API will return a response with:\n\n- **Status Code**: 200 OK\n    \n- **Content-Type**: application/json\n    \n- **Body**: A JSON object containing a message. The message will be an empty string in this case.\n    \n\n### Example Response\n\n``` json\n{\n  \"message\": \"\"\n}\n\n ```\n\nThis response indicates that the deletion was successful without any additional information."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Courses",
+			"item": [
+				{
+					"name": "Create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var template = `\r",
+									"<style type=\"text/css\">\r",
+									"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
+									"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
+									"    .tftable tr {background-color:#ffffff;}\r",
+									"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
+									"    .tftable tr:hover {background-color:#e0ffff;}\r",
+									"</style>\r",
+									"\r",
+									"<table class=\"tftable\" border=\"1\">\r",
+									"    <tr>\r",
+									"        <th>Field</th>\r",
+									"        <th>Value</th>\r",
+									"    </tr>\r",
+									"    <tr>\r",
+									"        <td>Success</td>\r",
+									"        <td>{{response.success}}</td>\r",
+									"    </tr>\r",
+									"    <tr>\r",
+									"        <td>Message</td>\r",
+									"        <td>{{response.message}}</td>\r",
+									"    </tr>\r",
+									"    <tr>\r",
+									"        <td>ID</td>\r",
+									"        <td>{{response.data.id}}</td>\r",
+									"    </tr>\r",
+									"    <tr>\r",
+									"        <td>Track ID</td>\r",
+									"        <td>{{response.data.trackId}}</td>\r",
+									"    </tr>\r",
+									"    <tr>\r",
+									"        <td>Title</td>\r",
+									"        <td>{{response.data.title}}</td>\r",
+									"    </tr>\r",
+									"    <tr>\r",
+									"        <td>Description</td>\r",
+									"        <td>{{response.data.description}}</td>\r",
+									"    </tr>\r",
+									"    <tr>\r",
+									"        <td>Image</td>\r",
+									"        <td>{{response.data.image}}</td>\r",
+									"    </tr>\r",
+									"    <tr>\r",
+									"        <td>Created At</td>\r",
+									"        <td>{{response.data.createdAt}}</td>\r",
+									"    </tr>\r",
+									"    <tr>\r",
+									"        <td>Updated At</td>\r",
+									"        <td>{{response.data.updatedAt}}</td>\r",
+									"    </tr>\r",
+									"</table>\r",
+									"`;\r",
+									"\r",
+									"function constructVisualizerPayload() {\r",
+									"    var res = pm.response.json();\r",
+									"    return { response: res };\r",
+									"}\r",
+									"\r",
+									"pm.visualizer.set(template, constructVisualizerPayload());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "trackId",
+									"value": "64811f7e-b09f-4d7f-bd66-eddcafcb5fdd",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "postman-cloud:///1f06edb0-12ee-48b0-918f-e6ddfc73fac7"
+								},
+								{
+									"key": "description",
+									"value": "Learn how to ethically exploit vulnerabilities in systems and assess network security through penetration testing.",
+									"type": "text"
+								},
+								{
+									"key": "title",
+									"value": "Ethical Hacking & Pen Testing",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{local}}/courses",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"courses"
+							]
+						},
+						"description": "### Add Course Endpoint\n\nThis endpoint allows you to create a new course by submitting relevant details such as the course title, description, associated track ID, and an image file. Upon successful creation, the server will respond with a success status.\n\n#### Request Format\n\n- **Method**: POST\n    \n- **Endpoint**: `{{local}}/courses`\n    \n- **Content-Type**: `multipart/form-data`\n    \n\n#### Request Body Parameters\n\nThe request body must include the following parameters:\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `trackId` | text | The identifier for the course track. |\n| `image` | file | The image file associated with the course. |\n| `description` | text | A brief description of the course. |\n| `title` | text | The title of the course. |\n\n#### Response Structure\n\nOn a successful request, the server will respond with a `201 Created` status and a JSON object containing the following fields:\n\n| Field | Type | Description |\n| --- | --- | --- |\n| `success` | boolean | Indicates if the course was created successfully. |\n| `message` | string | A message providing additional information (if any). |\n| `data` | object | An object containing the details of the created course, with the following properties: |\n|  |  | \\- `id`: The unique identifier of the course. |\n|  |  | \\- `trackId`: The identifier for the course track. |\n|  |  | \\- `title`: The title of the course. |\n|  |  | \\- `description`: The description of the course. |\n|  |  | \\- `image`: The URL or path to the uploaded image. |\n|  |  | \\- `createdAt`: Timestamp of when the course was created. |\n|  |  | \\- `updatedAt`: Timestamp of the last update to the course. |\n\nEnsure that all required fields are provided in the request to successfully create a new course."
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch All Without Query",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{local}}/courses",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"courses"
+							],
+							"query": [
+								{
+									"key": "trackId",
+									"value": "911ad134-1465-442e-badd-11a7b065db86",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "title",
+									"value": "Intro to UI/UX Design",
+									"disabled": true
+								}
+							]
+						},
+						"description": "## Retrieve Courses\n\nThis endpoint allows you to retrieve a list of courses available in the system. It returns course details along with pagination information.\n\n### Request\n\n- **Method**: GET\n    \n- **URL**: `{{local}}/courses`\n    \n\n### Response\n\nThe response will return a JSON object containing the following fields:\n\n- **data**: An array of course objects, where each course object includes:\n    \n    - **id**: Unique identifier for the course.\n        \n    - **trackId**: Identifier for the associated track.\n        \n    - **title**: Title of the course.\n        \n    - **description**: Brief description of the course.\n        \n    - **image**: URL of the course image.\n        \n    - **createdAt**: Timestamp of when the course was created.\n        \n    - **updatedAt**: Timestamp of the last update to the course.\n        \n    - **track**: An object containing details about the associated track:\n        \n        - **id**: Unique identifier for the track.\n            \n        - **name**: Name of the track.\n            \n        - **price**: Price of the track.\n            \n        - **duration**: Duration of the track.\n            \n        - **instructor**: Instructor of the track.\n            \n        - **description**: Description of the track.\n            \n        - **image**: URL of the track image.\n            \n        - **createdAt**: Timestamp of when the track was created.\n            \n        - **updatedAt**: Timestamp of the last update to the track.\n            \n- **page**: The current page number of the results.\n    \n- **totalPages**: Total number of pages available.\n    \n- **totalItems**: Total number of items available.\n    \n\n### Notes\n\n- Ensure that you have the necessary permissions to access the courses.\n    \n- The response will be paginated; use the `page` parameter to navigate through different pages if applicable."
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch With Filters",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{local}}/courses",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"courses"
+							],
+							"query": [
+								{
+									"key": "trackId",
+									"value": "911ad134-1465-442e-badd-11a7b065db86",
+									"disabled": true
+								},
+								{
+									"key": "title",
+									"value": "Network Security Fundamentals",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						},
+						"description": "## Get Courses by Track ID\n\nThis endpoint retrieves a list of courses based on the specified track ID and title. It allows users to paginate through the results by specifying the page number and the number of items per page.\n\n### Request Parameters\n\n- **trackId** (string): The unique identifier for the track to filter the courses.\n    \n- **title** (string): The title of the course to search for.\n    \n- **page** (integer): The page number for pagination. Default is 1.\n    \n- **limit** (integer): The number of items to return per page. Default is 1.\n    \n\n### Response\n\nOn a successful request, the API will return a JSON object with the following structure:\n\n- **data** (array): An array of course objects matching the search criteria.\n    \n    - Each course object contains:\n        \n        - **id** (string): The unique identifier for the course.\n            \n        - **trackId** (string): The ID of the track associated with the course.\n            \n        - **title** (string): The title of the course.\n            \n        - **description** (string): A brief description of the course.\n            \n        - **image** (string): URL to an image representing the course.\n            \n        - **createdAt** (string): Timestamp of when the course was created.\n            \n        - **updatedAt** (string): Timestamp of when the course was last updated.\n            \n        - **track** (object): An object containing details about the track.\n            \n            - **id** (string): The unique identifier for the track.\n                \n            - **name** (string): The name of the track.\n                \n            - **price** (string): The price of the track.\n                \n            - **duration** (string): The duration of the track.\n                \n            - **instructor** (string): The instructor for the track.\n                \n            - **description** (string): A brief description of the track.\n                \n            - **image** (string): URL to an image representing the track.\n                \n            - **createdAt** (string): Timestamp of when the track was created.\n                \n            - **updatedAt** (string): Timestamp of when the track was last updated.\n                \n- **page** (integer): The current page number of the results.\n    \n- **totalPages** (integer): The total number of pages available.\n    \n- **totalItems** (integer): The total number of items matching the search criteria.\n    \n\n### Notes\n\n- Ensure that the `trackId` and `title` parameters are correctly specified to receive the expected results.\n    \n- The response may contain empty values if no courses match the provided criteria."
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{local}}/courses/:id",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"courses",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "295f6909-0939-48c4-b681-2b3552dfbb91"
+								}
+							]
+						},
+						"description": "### Get Course by ID\n\nThis endpoint retrieves detailed information about a specific course identified by its unique ID.\n\n#### Request\n\n- **Method**: GET\n    \n- **URL**: `{{local}}/courses/:id`\n    \n- **Path Parameters**:\n    \n    - `id` (string): The unique identifier of the course you wish to retrieve.\n        \n\n#### Response\n\nOn a successful request, the server responds with a status code of `200` and returns a JSON object containing the following fields:\n\n- `id` (string): The unique identifier of the course.\n    \n- `trackId` (string): The identifier for the track associated with the course.\n    \n- `title` (string): The title of the course.\n    \n- `description` (string): A brief description of the course content.\n    \n- `image` (string): A URL to an image representing the course.\n    \n- `createdAt` (string): The timestamp when the course was created.\n    \n- `updatedAt` (string): The timestamp when the course was last updated.\n    \n- `track` (object): An object containing details about the track:\n    \n    - `id` (string): The unique identifier of the track.\n        \n    - `name` (string): The name of the track.\n        \n    - `price` (string): The price of the track.\n        \n    - `duration` (string): The duration of the track.\n        \n    - `instructor` (string): The name of the instructor for the track.\n        \n    - `description` (string): A brief description of the track.\n        \n    - `image` (string): A URL to an image representing the track.\n        \n    - `createdAt` (string): The timestamp when the track was created.\n        \n    - `updatedAt` (string): The timestamp when the track was last updated.\n        \n\nThis structure allows clients to understand both the course and its associated track, providing a comprehensive view of the course details."
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "trackId",
+									"value": "db6733da-4bd9-4f65-90d3-f4bad5a158b1",
+									"type": "text"
+								},
+								{
+									"key": "title",
+									"value": "Cyber fundentamental",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{local}}/courses/:id",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"courses",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "2ffe896f-2f3b-4dc9-adb1-2b95703fd48f"
+								}
+							]
+						},
+						"description": "## Update Course\n\nThis endpoint allows you to update an existing course identified by its unique `id`. You can modify the course's `trackId` and `title` through this request.\n\n### Request\n\n- **Method**: PUT\n    \n- **URL**: `{{local}}/courses/:id`\n    \n\n#### Request Body (form-data)\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `trackId` | text | The unique identifier for the track associated with the course. |\n| `title` | text | The title of the course. |\n\n### Response\n\nOn a successful update, the server responds with a status code of **200** and returns a JSON object containing the updated course details.\n\n#### Response Structure\n\n``` json\n{\n  \"id\": \"\",\n  \"trackId\": \"\",\n  \"title\": \"\",\n  \"description\": \"\",\n  \"image\": \"\",\n  \"createdAt\": \"\",\n  \"updatedAt\": \"\"\n}\n\n ```\n\n- `id`: The unique identifier of the course.\n    \n- `trackId`: The updated track identifier.\n    \n- `title`: The updated title of the course.\n    \n- `description`: A description of the course.\n    \n- `image`: A URL or path to the course image.\n    \n- `createdAt`: Timestamp of when the course was created.\n    \n- `updatedAt`: Timestamp of when the course was last updated."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "trackId",
+									"value": "db6733da-4bd9-4f65-90d3-f4bad5a158b1",
+									"type": "text"
+								},
+								{
+									"key": "title",
+									"value": "Cyber fundentamental",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{local}}/courses/:id",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"courses",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "295f6909-0939-48c4-b681-2b3552dfbb91"
+								}
+							]
+						},
+						"description": "## DELETE Course\n\nThis endpoint is used to delete a specific course identified by its unique `id`.\n\n### Request Parameters\n\nThe request requires the following parameters in the form-data body:\n\n- **trackId** (string): The identifier for the track associated with the course. This parameter is essential for identifying which course to delete.\n    \n- **title** (string): The title of the course to be deleted. This parameter helps in confirming the course being targeted for deletion.\n    \n\n### Response\n\nUpon successful deletion of the course, the API will return a response with the following details:\n\n- **Status**: 200 OK\n    \n- **Content-Type**: application/json\n    \n- { \"message\": \"\" }  \n    This response indicates that the course has been successfully deleted. The message field may contain additional information in future implementations.\n    \n\n### Notes\n\n- Ensure that the `id` in the URL is correctly specified to target the intended course.\n    \n- Both `trackId` and `title` parameters are required for the operation to be successful."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Learners",
+			"item": [
+				{
+					"name": "Get All Learners",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{local}}/learners?trackId=911ad134-1465-442e-badd-11a7b065db86",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"learners"
+							],
+							"query": [
+								{
+									"key": "paymentStatus",
+									"value": "paid",
+									"disabled": true
+								},
+								{
+									"key": "trackId",
+									"value": "911ad134-1465-442e-badd-11a7b065db86"
+								},
+								{
+									"key": "courseId",
+									"value": "2ffe896f-2f3b-4dc9-adb1-2b95703fd48f",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "firstName",
+									"value": "Admans",
+									"type": "text"
+								},
+								{
+									"key": "lastName",
+									"value": "Mohammed",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "adams@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "password123",
+									"type": "text"
+								},
+								{
+									"key": "trackId",
+									"value": "911ad134-1465-442e-badd-11a7b065db86",
+									"type": "text"
+								},
+								{
+									"key": "courseId",
+									"value": "2ffe896f-2f3b-4dc9-adb1-2b95703fd48f",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{local}}/learners",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"learners"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Invoices",
+			"item": [
+				{
+					"name": "Create Invoice",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"learnerId\": \"5220696d-3d06-4006-8e60-1a960436fd94\",\n  \"amountPaid\": 200\n//   \"paymentStatus\": \"PARTIAL\"\n}"
+						},
+						"url": {
+							"raw": "{{local}}/invoices",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"invoices"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Invoices",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local}}/invoices",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"invoices"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Payment",
+			"item": [
+				{
+					"name": "Initiate Transaction",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.expect(pm.response.code).to.eql(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response has required fields: status, message, and data\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData).to.have.all.keys('status', 'message', 'data');\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Data object contains required fields\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.data).to.exist.and.to.be.an('object');\r",
+									"    \r",
+									"    const requiredFields = ['authorization_url', 'access_code', 'reference'];\r",
+									"    requiredFields.forEach(function(field) {\r",
+									"        pm.expect(responseData.data).to.have.property(field);\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Status is a boolean and message is a string\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.status).to.be.a('boolean');\r",
+									"    pm.expect(responseData.message).to.be.a('string');\r",
+									"});\r",
+									"var responseData = pm.response.json();\r",
+									"\r",
+									"// Test the response body structure and values\r",
+									"pm.test(\"Response body structure is valid\", function () {\r",
+									"    pm.expect(responseData).to.be.an('object').that.has.all.keys('status', 'message', 'data');\r",
+									"    pm.expect(responseData.status).to.be.a('boolean');\r",
+									"    pm.expect(responseData.message).to.be.a('string');\r",
+									"    pm.expect(responseData.data).to.exist.and.to.be.an('object');\r",
+									"\r",
+									"    // Checking that the data object has the required properties\r",
+									"    const requiredFields = ['authorization_url', 'access_code', 'reference'];\r",
+									"    requiredFields.forEach(function(field) {\r",
+									"        pm.expect(responseData.data).to.have.property(field);\r",
+									"    });\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "learnerId",
+									"value": "5220696d-3d06-4006-8e60-1a960436fd94",
+									"type": "text"
+								},
+								{
+									"key": "amountPaid",
+									"value": "200",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{local}}/initiate",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"initiate"
+							]
+						},
+						"description": "## Endpoint: Initiate Payment\n\nThis endpoint is used to initiate a payment process for a learner. It accepts specific parameters that identify the learner and the amount to be paid, and it returns a response containing the payment authorization details.\n\n### Request\n\n**Method:** POST  \n**URL:** `{{local}}/initiate`  \n**Content-Type:** application/x-www-form-urlencoded\n\n#### Parameters\n\n- **learnerId** (text): The unique identifier for the learner initiating the payment. This parameter is required to associate the payment with the correct learner.\n    \n- **amountPaid** (text): The amount of money that is being paid. This parameter must be specified to process the payment correctly.\n    \n\n### Response\n\n**Status Code:** 200  \n**Content-Type:** application/json\n\n#### Response Structure\n\nThe response will contain the following fields:\n\n- **status** (boolean): Indicates whether the payment initiation was successful or not.\n    \n- **message** (string): A message providing additional information about the request status (may be empty).\n    \n- **data** (object): Contains the payment authorization details:\n    \n    - **authorization_url** (string): The URL to which the user should be redirected to complete the payment.\n        \n    - **access_code** (string): A code used to access the payment process.\n        \n    - **reference** (string): A unique reference for the payment transaction.\n        \n\n### Example Response\n\n``` json\n{\n  \"status\": true,\n  \"message\": \"\",\n  \"data\": {\n    \"authorization_url\": \"\",\n    \"access_code\": \"\",\n    \"reference\": \"\"\n  }\n}\n\n ```\n\nThis endpoint is essential for managing payment processes efficiently and ensuring that transactions are linked to the correct learner."
+					},
+					"response": []
+				},
+				{
+					"name": "Create webhook",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"event\": \"charge.success\",\r\n  \"data\": {\r\n    \"amount\": 200000,\r\n    \"reference\": \"ovc2smo4cj\",\r\n    \"metadata\": {\r\n      \"learnerId\": \"5220696d-3d06-4006-8e60-1a960436fd94\"\r\n    }\r\n  }\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local}}/initiate/webhook",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"initiate",
+								"webhook"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Report",
+			"item": [
+				{
+					"name": "Total Learners",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/reports/total-learners",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"reports",
+								"total-learners"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Total Income",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/reports/total-income",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"reports",
+								"total-income"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Income Per Track",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/reports/income-per-track",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"reports",
+								"income-per-track"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Learners Per Track",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{local}}/reports/learners-per-track",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"reports",
+								"learners-per-track"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Admin Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/profile",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/profile",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"profile"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
