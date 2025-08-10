@@ -30,12 +30,20 @@ This is the backend service for **G-client**, a student management platform buil
   - CRUD operations for Tracks and Courses.
   - Tracks contain Courses (one-to-many).
 
-- 💰 **Paystack Payment Integration**
+- 💰 **Pay stack Payment Integration**
 
   - Initiate transaction
-  - Redirect learner to Paystack authorization URL.
+  - Redirect learner to Pay stack authorization URL.
   - Verify payment via webhook and update invoice accordingly.
   - Payment references are matched with learner invoices.
+
+  <!-- Week 4  -->
+
+- 📊**Reports system**
+
+  - Total Learners : Returns the count of all registered learners.
+  - Total Income — Calculates total amount paid across all invoices.
+  - Income per Track — Groups total income by each track (UI/UX, Data, etc).
 
 - 🧪 **Robust Validation & Testing**
   - Validates request payloads using Zod.
@@ -53,7 +61,7 @@ This is the backend service for **G-client**, a student management platform buil
 | **Prisma ORM**     | Type-safe, auto-completion in TypeScript, schema migrations.             |
 | **Zod**            | Elegant runtime schema validation that works seamlessly with TypeScript. |
 | **JWT + Cookie**   | Secure, session-based authentication.                                    |
-| **Paystack**       | Trusted and developer-friendly payment solution for Africa.              |
+| **Pays tack**      | Trusted and developer-friendly payment solution for Africa.              |
 | **Jest/Supertest** | Powerful testing combo for unit and integration testing.                 |
 
 ---
@@ -73,7 +81,7 @@ This is the backend service for **G-client**, a student management platform buil
 │   ├── models/           # Prisma-generated types and enums
 │   ├── routes/           # Express route definitions
 │   ├── services/         # Business logic and helpers
-│   ├── utils/            # Utility functions (e.g., paystack, response wrappers)
+│   ├── utils/            # Utility functions (e.g., pay stack, response wrappers)
 │   ├── validations/      # Zod schemas for input validation
 │   └── index.ts          # Entry point
 │
@@ -111,7 +119,7 @@ Create a `.env` file:
 ```env
 DATABASE_URL=postgresql://your-db-url
 JWT_SECRET=yourSecret
-PAYSTACK_SECRET_KEY=yourPaystackKey
+PAY STACK_SECRET_KEY=yourPay stackKey
 FRONTEND_URL=http://localhost:3000
 COOKIE_SECRET=anotherSecret
 ```

@@ -14,6 +14,7 @@ import { upload } from "./middleware/upload.middleware";
 import { errorHandler } from "./middleware/errorHandler";
 import { globalRateLimiter } from "./middleware/rate.limiter";
 import { cookie_session } from "./middleware/cookie_session.middleware";
+import reportRouter from "./routes/report.routes";
 
 const app = express();
 const mainRouter = express.Router(); //main router
@@ -39,7 +40,7 @@ app.use(cookie_session);
 app.use(globalRateLimiter);
 app.use(upload.single("image"));
 
-app.use("/gclient/api", mainRouter); //main router entry
+app.use("/gclient/api/admin", mainRouter); //main router entry
 
 //all routes mount under gclient/v1/api
 mainRouter.use("/auth", authRoute);
@@ -49,9 +50,10 @@ mainRouter.use("/learners", learnerRoute);
 mainRouter.use("/invoices", invoiceRoute);
 mainRouter.use(
   "/initiate",
-  // express.raw({ type: "application/json" }), // required by Paystack
+  // express.raw({ type: "application/json" }), // required by Pay stack
   paymentRouter
 );
+mainRouter.use("/reports", reportRouter);
 
 // global error handler middleware
 app.use(errorHandler);

@@ -18,12 +18,14 @@ const upload_middleware_1 = require("./middleware/upload.middleware");
 const errorHandler_1 = require("./middleware/errorHandler");
 const rate_limiter_1 = require("./middleware/rate.limiter");
 const cookie_session_middleware_1 = require("./middleware/cookie_session.middleware");
+const report_routes_1 = __importDefault(require("./routes/report.routes"));
 const app = (0, express_1.default)();
 const mainRouter = express_1.default.Router(); //main router
 //Connect to the database
 (0, db_1.dbConnection)();
 /*basic middleware */
 app.use((0, morgan_1.default)("dev"));
+app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, cors_1.default)({
     origin: "http://localhost:3000",
@@ -34,16 +36,18 @@ app.use((0, cors_1.default)({
 app.use((0, helmet_1.default)());
 app.use(cookie_session_middleware_1.cookie_session);
 app.use(rate_limiter_1.globalRateLimiter);
-app.use("/gclient/api", mainRouter); //main router entry
-mainRouter.use("/initiate", payment_route_1.default);
-app.use(express_1.default.json());
 app.use(upload_middleware_1.upload.single("image"));
+app.use("/gclient/api/admin", mainRouter); //main router entry
 //all routes mount under gclient/v1/api
 mainRouter.use("/auth", auth_route_1.default);
 mainRouter.use("/tracks", tracks_route_1.default);
 mainRouter.use("/courses", courses_route_1.default);
 mainRouter.use("/learners", learner_route_1.default);
 mainRouter.use("/invoices", invoice_route_1.default);
+mainRouter.use("/initiate", 
+// express.raw({ type: "application/json" }), // required by Pay stack
+payment_route_1.default);
+mainRouter.use("/reports", report_routes_1.default);
 // global error handler middleware
 app.use(errorHandler_1.errorHandler);
 app.get("/", (req, res) => {
