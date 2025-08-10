@@ -1,10 +1,10 @@
 import { NextFunction, Request as ExpressRequest, Response } from "express";
 
-import jwt, { Secret } from "jsonwebtoken";
+// import jwt, { Secret } from "jsonwebtoken";
 import { Role } from "../../generated/prisma";
 
 export interface Request extends ExpressRequest {
-  user?: any; // Optional user property
+  user?: any;
 }
 
 /**
@@ -48,13 +48,19 @@ export interface Request extends ExpressRequest {
 //   };
 // };
 
+/**
+ * Middleware to authenticate session tokens and authorize user roles.
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Next function to call the next middleware
+ */
 //switch to session based authorization
 export const requireAuth = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.session?.user?.id || !req?.session?.user?.role) {
+  if (!req.session?.user?.id) {
     return res.status(401).json({ message: "Unauthorized: No session found" });
   }
   next();

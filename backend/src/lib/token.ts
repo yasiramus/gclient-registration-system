@@ -15,7 +15,7 @@ export async function generateVerificationToken(
     data: {
       token,
       type,
-      userId,
+      adminId: userId,
       expiresAt,
     },
   });

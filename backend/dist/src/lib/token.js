@@ -23,9 +23,9 @@ function generateVerificationToken(userId, type) {
             data: {
                 token,
                 type,
-                userId,
+                adminId: userId,
                 expiresAt,
-            }
+            },
         });
         return newToken;
     });

@@ -43,109 +43,69 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCourse = exports.updateCourse = exports.getAllCourses = exports.getCourseById = exports.createCourse = void 0;
+const course_schema_1 = require("../schema/course.schema");
 const courseService = __importStar(require("../services/courses.service"));
-const createCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { title, description, trackId } = req.body;
-        if (!req.file) {
-            return res
-                .status(400)
-                .json({ success: false, message: "Course image is required" });
-        }
-        const image = req.file.filename;
-        const newCourse = yield courseService.createCourse({
-            image,
-            title,
-            trackId,
-            description,
-        });
-        return res.status(201).json({
-            success: true,
-            message: "Course created successfully",
-            data: newCourse,
-        });
-    }
-    catch (error) {
-        console.error("Create Course Error:", error);
-        return res.status(500).json({
-            success: false,
-            message: error.message || "Failed to create course",
-        });
-    }
-});
-exports.createCourse = createCourse;
+const validateRequest_1 = require("../middleware/validateRequest");
+const sendResponse_1 = require("../lib/sendResponse");
+exports.createCourse = (0, validateRequest_1.parseZod)(course_schema_1.coursesSchema, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const data = Object.assign(Object.assign({}, req.body), { image: (_a = req === null || req === void 0 ? void 0 : req.file) === null || _a === void 0 ? void 0 : _a.originalname });
+    const course = yield courseService.createCourse(data);
+    return (0, sendResponse_1.sendResponse)(res, {
+        message: "Course created",
+        data: course,
+        statusCode: 201,
+    });
+}));
 const getCourseById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { id } = req.params;
-        const course = yield courseService.getCourseById(id);
-        if (!course) {
-            return res.status(404).json({ message: "Course not found" });
-        }
-        res.status(200).json(course);
-    }
-    catch (error) {
-        console.error("Error retrieving course:", error);
-        res.status(500).json({ message: error.message || "Internal server error" });
-    }
+    const { id } = req.params;
+    const course = yield courseService.getCourseById(id);
+    return (0, sendResponse_1.sendResponse)(res, {
+        message: "Course fetched",
+        data: course,
+    });
 });
 exports.getCourseById = getCourseById;
-const getAllCoursesNOPagination = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const courses = yield courseService.getAllCourses();
-        res.status(200).json(courses);
-    }
-    catch (error) {
-        console.error("Error fetching courses:", error);
-        res.status(500).json({ message: "Internal server error" });
-    }
-});
+// const getAllCoursesNOPagination = async (_req: Request, res: Response) => {
+//   try {
+//     const courses = await courseService.getAllCourses();
+//     res.status(200).json(courses);
+//   } catch (error) {
+//     console.error("Error fetching courses:", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
 /**with filters and pagination */
 const getAllCourses = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { trackId, title, page = 1, limit = 10 } = req.query;
-        const filters = {
-            trackId: trackId ? String(trackId) : undefined,
-            title: title ? String(title) : undefined,
-            page: Number(page),
-            limit: Number(limit),
-        };
-        const result = yield courseService.findAllWithFilters(filters);
-        res.status(200).json(result);
-    }
-    catch (error) {
-        console.error("Error fetching courses:", error);
-        res.status(500).json({ message: "Internal server error" });
-    }
+    const { trackId, title, page = 1, limit = 10 } = req.query;
+    const filters = {
+        trackId: trackId ? String(trackId) : undefined,
+        title: title ? String(title) : undefined,
+        page: Number(page),
+        limit: Number(limit),
+    };
+    const courses = yield courseService.findAllWithFilters(filters);
+    return (0, sendResponse_1.sendResponse)(res, {
+        message: "Courses fetched",
+        data: courses,
+    });
 });
 exports.getAllCourses = getAllCourses;
-const updateCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { id } = req.params;
-        const data = req.body;
-        const updated = yield courseService.updateCourse(id, data);
-        if (!updated) {
-            return res.status(404).json({ message: "Course not found" });
-        }
-        res.status(200).json(updated);
-    }
-    catch (error) {
-        console.error("Error updating course:", error);
-        res.status(500).json({ message: "Internal server error" });
-    }
-});
-exports.updateCourse = updateCourse;
+exports.updateCourse = (0, validateRequest_1.parseZod)(course_schema_1.updateCourseSchema, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const { id } = req.params;
+    const image = (_a = req.file) === null || _a === void 0 ? void 0 : _a.filename;
+    const data = Object.assign(Object.assign({}, req.body), { image: image || undefined });
+    const course = yield courseService.updateCourse(id, data);
+    res.status(200).json(course);
+    return (0, sendResponse_1.sendResponse)(res, {
+        message: "Course updated",
+        data: course,
+    });
+}));
 const deleteCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { id } = req.params;
-        const deleted = yield courseService.deleteCourse(id);
-        if (!deleted) {
-            return res.status(404).json({ message: "Course not found" });
-        }
-        res.status(200).json({ message: "Course deleted successfully" });
-    }
-    catch (error) {
-        console.error("Error deleting course:", error);
-        res.status(500).json({ message: "Internal server error" });
-    }
+    const { id } = req.params;
+    yield courseService.deleteCourse(id);
+    return (0, sendResponse_1.sendResponse)(res, { message: "Course deleted" });
 });
 exports.deleteCourse = deleteCourse;

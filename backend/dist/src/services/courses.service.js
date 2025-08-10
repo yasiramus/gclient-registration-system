@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findAllWithFilters = exports.deleteCourse = exports.updateCourse = exports.getCourseById = exports.getAllCourses = exports.createCourse = void 0;
+exports.findAllWithFilters = exports.deleteCourse = exports.updateCourse = exports.getCourseById = exports.createCourse = void 0;
 const client_1 = require("../db/client");
 const createCourse = (data) => __awaiter(void 0, void 0, void 0, function* () {
     const track = yield client_1.prisma.track.findUnique({ where: { id: data.trackId } });
@@ -18,13 +18,12 @@ const createCourse = (data) => __awaiter(void 0, void 0, void 0, function* () {
     return client_1.prisma.course.create({ data });
 });
 exports.createCourse = createCourse;
-const getAllCourses = () => __awaiter(void 0, void 0, void 0, function* () {
-    return client_1.prisma.course.findMany({
-        include: { track: true },
-        orderBy: { createdAt: "desc" },
-    });
-});
-exports.getAllCourses = getAllCourses;
+// export const getAllCourses = async () => {
+//   return prisma.course.findMany({
+//     include: { track: true },
+//     orderBy: { createdAt: "desc" },
+//   });
+// };
 const getCourseById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     if (!id)
         throw new Error("No id provided");
@@ -43,13 +42,14 @@ const updateCourse = (id, data) => __awaiter(void 0, void 0, void 0, function* (
     const course = yield client_1.prisma.course.findUnique({ where: { id } });
     if (!course)
         throw new Error("Course not found");
-    if (data.trackId) {
-        const track = yield client_1.prisma.track.findUnique({
-            where: { id: data.trackId },
-        });
-        if (!track)
-            throw new Error("Invalid trackId");
-    }
+    if (!data)
+        throw new Error("No data provided");
+    // if (data.trackId) {
+    const track = yield client_1.prisma.track.findUnique({
+        where: { id: data.trackId },
+    });
+    if (!track)
+        throw new Error("Invalid trackId");
     return client_1.prisma.course.update({ where: { id }, data });
 });
 exports.updateCourse = updateCourse;
@@ -59,7 +59,8 @@ const deleteCourse = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const course = yield client_1.prisma.course.findUnique({ where: { id } });
     if (!course)
         throw new Error("Course not found");
-    return client_1.prisma.course.delete({ where: { id } });
+    const deleted = yield client_1.prisma.course.delete({ where: { id } });
+    return `${deleted.title} has been removed from tracks`;
 });
 exports.deleteCourse = deleteCourse;
 /**with filters */
@@ -80,8 +81,10 @@ const findAllWithFilters = (_a) => __awaiter(void 0, [_a], void 0, function* ({ 
         }),
         client_1.prisma.course.count({ where }),
     ]);
+    if (!courses)
+        throw new Error("No courses found");
     return {
-        data: courses,
+        courses,
         page,
         totalPages: Math.ceil(total / limit),
         totalItems: total,

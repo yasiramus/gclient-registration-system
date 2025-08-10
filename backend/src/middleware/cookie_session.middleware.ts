@@ -7,8 +7,11 @@ export const cookie_session = cookieSession({
   keys: [process.env.JWT_SECRET || "gclient_admin_keys"],
   secure: process.env.NODE_ENV === "production", //on localhost set to false
   httpOnly: true,
-  // domain: "example.com",
-  path: "gclient",
+  // domain: "gclient.com",
+  path: "/gclient/api",
   expires: generateExpirationDate(1, 0), //set to 1hour
   sameSite: "strict",
 });
+
+// errol and make payment before they can access coursees
+// the learner register by themselfves

@@ -20,44 +20,47 @@ const prisma_1 = require("../../generated/prisma");
 const timestamp = Date.now();
 exports.testEmail = `admin${timestamp}@gclient.com`;
 exports.testPassword = "admin1234";
-describe("POST /api/auth/admin/register", () => {
+describe("POST /gclient/api/auth/admin/register", () => {
     let superAdminToken;
     beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
         yield client_1.prisma.$connect();
-        // first login as a supper admin 
-        const res = yield (0, supertest_1.default)(app_1.default).post("/api/auth/login").send({
-            email: "admintest2@gclient.com",
-            password: exports.testPassword
+        // first login as a supper admin
+        const res = yield (0, supertest_1.default)(app_1.default).post("/gclient/api/auth/login").send({
+            email: "admin@gclient.com",
+            password: exports.testPassword,
         });
         superAdminToken = res.body.data.token;
-        console.log(res.body.message, superAdminToken);
+        console.log(res.body.message, superAdminToken, "loin_super_admin");
     }));
     afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
-        yield client_1.prisma.user.deleteMany({
+        yield client_1.prisma.admin.deleteMany({
             where: {
-                role: prisma_1.Role.ADMIN
+                role: prisma_1.Role.ADMIN,
             },
         });
         yield client_1.prisma.$disconnect();
     }));
     it("should register a new admin dynamically", () => __awaiter(void 0, void 0, void 0, function* () {
         // Generate a unique email for every test run
-        const res = yield (0, supertest_1.default)(app_1.default).post("/api/auth/admin/register").set("Authorization", `Bearer ${superAdminToken}`).send({
+        const res = yield (0, supertest_1.default)(app_1.default)
+            .post("/gclient/api/auth/admin/register")
+            .set("Authorization", `Bearer ${superAdminToken}`)
+            .send({
             firstName: "New",
             lastName: "Admin",
             email: exports.testEmail,
             password: exports.testEmail,
         });
         expect(res.statusCode).toBe(201);
-        expect(res.body.message).toBe("Admin registered successfully");
+        expect(res.body.message).toBe("Admin Registration completed. Check your email to verify.");
         expect(res.body.data).toMatchObject({
             email: exports.testEmail,
-            role: "ADMIN"
+            role: "ADMIN",
         });
-        expect(res.body.data).toHaveProperty("otp");
+        expect(res.body.data).toHaveProperty("email");
     }));
     // it("should return 400 if email already exists", async () => {
-    //     // First register a user
+    //     // First register a admin
     //     await request(app).post("/api/auth/admin/register").send({
     //         firstName: "Jane",
     //         lastName: "Doe",
@@ -81,7 +84,7 @@ describe("POST /api/auth/admin/register", () => {
     //         lastName: "Doe",
     //         email: "",
     //         password: "short"
-    //     }); 
+    //     });
     //     expect(res.statusCode).toBe(400);
     //     expect(res.body.message).toBe("Password must be at least 8 characters long")
     // })
@@ -89,9 +92,9 @@ describe("POST /api/auth/admin/register", () => {
     //     expect.assertions(1);
     //     try {
     //         await request(app).post("/api/auth/admin/register").send({
-    //             firstName: "Jane",      
+    //             firstName: "Jane",
     //             lastName: "Doe",
-    //             email: "invalid-email", 
+    //             email: "invalid-email",
     //             password: "short"
     //         });
     //     } catch (error) {
