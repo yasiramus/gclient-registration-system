@@ -5,16 +5,17 @@ import cors from "cors";
 
 import { dbConnection } from "./db";
 import authRoute from "./routes/auth.route";
+import adminRoute from "./routes/admin.route";
 import trackRoute from "./routes/tracks.route";
 import learnerRoute from "./routes/learner.route";
 import coursesRoute from "./routes/courses.route";
+import reportRouter from "./routes/report.routes";
 import invoiceRoute from "./routes/invoice.route";
 import paymentRouter from "./routes/payment.route";
 import { upload } from "./middleware/upload.middleware";
 import { errorHandler } from "./middleware/errorHandler";
 import { globalRateLimiter } from "./middleware/rate.limiter";
 import { cookie_session } from "./middleware/cookie_session.middleware";
-import reportRouter from "./routes/report.routes";
 
 const app = express();
 const mainRouter = express.Router(); //main router
@@ -54,6 +55,7 @@ mainRouter.use(
   paymentRouter
 );
 mainRouter.use("/reports", reportRouter);
+mainRouter.use("/profile", adminRoute);
 
 // global error handler middleware
 app.use(errorHandler);
