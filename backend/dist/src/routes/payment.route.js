@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const prisma_1 = require("../../generated/prisma");
+const payment_controller_1 = require("../controllers/payment.controller");
+const webhook_controller_1 = require("../controllers/webhook.controller");
+const auth_middleware_1 = require("../middleware/auth.middleware");
+const paymentRouter = (0, express_1.Router)();
+paymentRouter.use(auth_middleware_1.requireAuth);
+paymentRouter.use((0, auth_middleware_1.authorizeRoles)(prisma_1.Role.SUPER_ADMIN || prisma_1.Role.ADMIN));
+paymentRouter.post("/", payment_controller_1.initiatePayment);
+paymentRouter.post("/webhook", webhook_controller_1.handlePaystackWebhook);
+exports.default = paymentRouter;
