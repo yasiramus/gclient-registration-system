@@ -42,115 +42,55 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteTrack = exports.updateTrack = exports.getTracks = exports.getAllTracks = exports.createTrack = void 0;
-const prisma_1 = require("../../generated/prisma");
+exports.deleteTrack = exports.updateTrack = exports.getTrackById = exports.getAllTracks = exports.createTrack = void 0;
+const sendResponse_1 = require("../lib/sendResponse");
+const validateRequest_1 = require("../middleware/validateRequest");
 const trackService = __importStar(require("../services/tracks.service"));
+const track_schema_1 = require("../schema/track.schema");
 /**createTrack */
-const createTrack = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        if (!req.body) {
-            return res.json({ body_data: req.body });
-        }
-        const { name, price, duration, instructor, description } = req.body;
-        if (!req.file) {
-            return res
-                .status(400)
-                .json({ success: false, message: "Image file is required" });
-        }
-        const image = req.file.filename;
-        const newTrack = yield trackService.createTrack({
-            name,
-            price: prisma_1.Prisma.Decimal(price),
-            duration,
-            instructor,
-            description,
-            image,
-        });
-        return res.status(201).json({
-            success: true,
-            message: "Track created successfully",
-            data: newTrack,
-        });
-    }
-    catch (error) {
-        console.error("Create Track Error:", error);
-        return res.status(500).json({
-            success: false,
-            message: error.message || "Failed to create track",
-        });
-    }
-});
-exports.createTrack = createTrack;
+exports.createTrack = (0, validateRequest_1.parseZod)(track_schema_1.CreateTrackSchema, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const data = Object.assign(Object.assign({}, req.body), { image: (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname });
+    const track = yield trackService.createTrack(data);
+    return (0, sendResponse_1.sendResponse)(res, {
+        message: "Track created",
+        data: track,
+        statusCode: 201,
+    });
+}));
 // getAllTracks
 const getAllTracks = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const tracks = yield trackService.getAllTracks();
-        return res.status(200).json(tracks);
-    }
-    catch (err) {
-        return res
-            .status(500)
-            .json({ error: err.message || "Failed to fetch all tracks" });
-    }
+    const tracks = yield trackService.getAllTracks();
+    return (0, sendResponse_1.sendResponse)(res, {
+        message: "Tracks retrieved successfully",
+        data: tracks,
+    });
 });
 exports.getAllTracks = getAllTracks;
-// getTracks;
-const getTracks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const track = yield trackService.getTrackById(req.params.id);
-        if (!track)
-            return res.status(404).json({ error: "Track not found" });
-        return res.json(track);
-    }
-    catch (err) {
-        return res
-            .status(500)
-            .json({ error: err.message || "Error retrieving track" });
-    }
+//getTracks;
+const getTrackById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const track = yield trackService.getTrackById(req.params.id);
+    return (0, sendResponse_1.sendResponse)(res, {
+        message: "Track retrieved",
+        data: track,
+    });
 });
-exports.getTracks = getTracks;
+exports.getTrackById = getTrackById;
 // updateTrack;
-const updateTrack = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.updateTrack = (0, validateRequest_1.parseZod)(track_schema_1.UpdateTrackSchema, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    try {
-        if (!req.body)
-            throw new Error(req.body);
-        const { name, price, duration, instructor, description } = req.body;
-        const image = (_a = req.file) === null || _a === void 0 ? void 0 : _a.filename;
-        const updatedTrack = yield trackService.updateTrack(req.params.id, {
-            name,
-            price: prisma_1.Prisma.Decimal(price),
-            duration,
-            instructor,
-            description,
-            image,
-        });
-        return res.status(200).json({
-            message: "Track updated successfully",
-            data: updatedTrack,
-        });
-    }
-    catch (err) {
-        console.log("err: ", err);
-        return res
-            .status(500)
-            .json({ error: err.message || "Failed to update track" });
-    }
-});
-exports.updateTrack = updateTrack;
+    const image = (_a = req.file) === null || _a === void 0 ? void 0 : _a.filename;
+    const data = Object.assign(Object.assign({}, req.body), { image: image ? image : undefined });
+    const updatedTrack = yield trackService.updateTrack(req.params.id, data);
+    return (0, sendResponse_1.sendResponse)(res, {
+        message: "Track updated",
+        data: updatedTrack,
+    });
+}));
 // deleteTrack;
 const deleteTrack = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        yield trackService.deleteTrack(req.params.id);
-        return res
-            .status(204)
-            .json(`${req.params.id} has been deleted successfully`);
-    }
-    catch (err) {
-        console.log("delete_track", err.message);
-        return res
-            .status(500)
-            .json({ error: err.message || "Failed to delete track" });
-    }
+    const { id } = req.params;
+    const deleted = yield trackService.deleteTrack(id);
+    return (0, sendResponse_1.sendResponse)(res, { message: "Track deleted", data: deleted });
 });
 exports.deleteTrack = deleteTrack;

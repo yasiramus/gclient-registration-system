@@ -10,7 +10,7 @@ export const createTrack = async (
     },
   });
 
-  if (existingTrack) throw new Error("Duplicate tack name");
+  if (existingTrack) throw new Error("Track name already exists");
   return await prisma.track.create({ data });
 };
 
@@ -29,8 +29,8 @@ export const getTrackById = async (id: string) => {
     where: { id },
     include: { courses: true },
   });
-  if (findTrack) return findTrack;
-  throw new Error("No track found");
+  if (!findTrack) throw new Error("No track found");
+  return findTrack;
 };
 
 export const updateTrack = async (id: string, data: Partial<Track>) => {
@@ -50,5 +50,5 @@ export const deleteTrack = async (id: string) => {
   if (!id) throw new Error("No id provided");
   const record = await prisma.track.delete({ where: { id } });
   if (!record) throw new Error(" No record was found for a delete");
-  return record;
+  return `${record.name} has been removed from tracks`;
 };

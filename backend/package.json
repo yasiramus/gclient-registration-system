@@ -62,7 +62,8 @@
     "morgan": "^1.10.0",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.5",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "zod": "^4.0.14"
   },
   "devDependencies": {
     "@babel/core": "^7.28.0",

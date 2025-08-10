@@ -5,9 +5,15 @@ import cors from "cors";
 
 import { dbConnection } from "./db";
 import authRoute from "./routes/auth.route";
+import adminRoute from "./routes/admin.route";
 import trackRoute from "./routes/tracks.route";
+import learnerRoute from "./routes/learner.route";
 import coursesRoute from "./routes/courses.route";
+import reportRouter from "./routes/report.routes";
+import invoiceRoute from "./routes/invoice.route";
+import paymentRouter from "./routes/payment.route";
 import { upload } from "./middleware/upload.middleware";
+import { errorHandler } from "./middleware/errorHandler";
 import { globalRateLimiter } from "./middleware/rate.limiter";
 import { cookie_session } from "./middleware/cookie_session.middleware";
 
@@ -18,8 +24,8 @@ const mainRouter = express.Router(); //main router
 dbConnection();
 
 /*basic middleware */
-app.use(express.json());
 app.use(morgan("dev"));
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
@@ -33,15 +39,26 @@ app.use(helmet());
 
 app.use(cookie_session);
 app.use(globalRateLimiter);
-
 app.use(upload.single("image"));
 
-app.use("/gclient/api", mainRouter); //main router entry
+app.use("/gclient/api/admin", mainRouter); //main router entry
 
 //all routes mount under gclient/v1/api
 mainRouter.use("/auth", authRoute);
 mainRouter.use("/tracks", trackRoute);
 mainRouter.use("/courses", coursesRoute);
+mainRouter.use("/learners", learnerRoute);
+mainRouter.use("/invoices", invoiceRoute);
+mainRouter.use(
+  "/initiate",
+  // express.raw({ type: "application/json" }), // required by Pay stack
+  paymentRouter
+);
+mainRouter.use("/reports", reportRouter);
+mainRouter.use("/profile", adminRoute);
+
+// global error handler middleware
+app.use(errorHandler);
 
 app.get("/", (req, res) => {
   res.send("Welcome to the GClient Registration System API");

@@ -8,6 +8,8 @@ backend/.env
 backend/generated/prisma
 /backend.yarn/
 backend/yarn.lock
+backend/package-lock.json
+backend/dist
 
 # Ignore lockfile from other package managers
 package-lock.json
