@@ -6,14 +6,15 @@ import { hashPassword } from "../lib/hash";
 
 /**learner sign up */
 export const createLearner = async (
-  data: Omit<Learner, "id" | "createdAt" | "updatedAt">
+  datas: Omit<Learner, "id" | "createdAt" | "updatedAt">
 ) => {
-  const { email, password } = data;
+  const { email, password } = datas;
   const existingUser = await prisma.learner.findUnique({ where: { email } });
   const hash = await hashPassword(password);
   if (!hash) throw new Error("password can't be hashed");
 
-  if (existingUser) throw new Error("Student found login");
+  const data = { ...datas, password: hash };
+  if (existingUser) throw new Error("Email already registered");
   return await prisma.learner.create({
     data,
     select: {

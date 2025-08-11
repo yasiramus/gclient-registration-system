@@ -18,7 +18,7 @@ export const createLearner = parseZod(
     if (password !== confirm_password)
       return sendResponse(res, {
         status: false,
-        message: "password don't match",
+        message: "passwords don't match",
         statusCode: 401,
       });
 
