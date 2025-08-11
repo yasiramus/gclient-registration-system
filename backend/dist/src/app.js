@@ -9,16 +9,18 @@ const helmet_1 = __importDefault(require("helmet"));
 const cors_1 = __importDefault(require("cors"));
 const db_1 = require("./db");
 const auth_route_1 = __importDefault(require("./routes/auth.route"));
+const admin_route_1 = __importDefault(require("./routes/admin.route"));
 const tracks_route_1 = __importDefault(require("./routes/tracks.route"));
 const learner_route_1 = __importDefault(require("./routes/learner.route"));
 const courses_route_1 = __importDefault(require("./routes/courses.route"));
+const report_routes_1 = __importDefault(require("./routes/report.routes"));
 const invoice_route_1 = __importDefault(require("./routes/invoice.route"));
 const payment_route_1 = __importDefault(require("./routes/payment.route"));
 const upload_middleware_1 = require("./middleware/upload.middleware");
 const errorHandler_1 = require("./middleware/errorHandler");
 const rate_limiter_1 = require("./middleware/rate.limiter");
 const cookie_session_middleware_1 = require("./middleware/cookie_session.middleware");
-const report_routes_1 = __importDefault(require("./routes/report.routes"));
+const student_route_1 = __importDefault(require("./routes/student/student.route"));
 const app = (0, express_1.default)();
 const mainRouter = express_1.default.Router(); //main router
 //Connect to the database
@@ -37,17 +39,20 @@ app.use((0, helmet_1.default)());
 app.use(cookie_session_middleware_1.cookie_session);
 app.use(rate_limiter_1.globalRateLimiter);
 app.use(upload_middleware_1.upload.single("image"));
-app.use("/gclient/api/admin", mainRouter); //main router entry
+app.use("/gclient/api", mainRouter); //main router entry
 //all routes mount under gclient/v1/api
-mainRouter.use("/auth", auth_route_1.default);
-mainRouter.use("/tracks", tracks_route_1.default);
-mainRouter.use("/courses", courses_route_1.default);
-mainRouter.use("/learners", learner_route_1.default);
-mainRouter.use("/invoices", invoice_route_1.default);
-mainRouter.use("/initiate", 
+mainRouter.use("/admin/auth", auth_route_1.default);
+mainRouter.use("/admin/tracks", tracks_route_1.default);
+mainRouter.use("/admin/courses", courses_route_1.default);
+mainRouter.use("/admin/learners", learner_route_1.default);
+mainRouter.use("/admin/invoices", invoice_route_1.default);
+mainRouter.use("/admin/initiate", 
 // express.raw({ type: "application/json" }), // required by Pay stack
 payment_route_1.default);
-mainRouter.use("/reports", report_routes_1.default);
+mainRouter.use("/admin/reports", report_routes_1.default);
+mainRouter.use("/admin/profile", admin_route_1.default);
+//student|learner
+mainRouter.use("/student", student_route_1.default);
 // global error handler middleware
 app.use(errorHandler_1.errorHandler);
 app.get("/", (req, res) => {

@@ -1,10 +1,26 @@
+import { Learner } from "../../generated/prisma";
 import { prisma } from "../db/client";
 
 import { LearnerFilters } from "../interfaces/learners.int";
+import { hashPassword } from "../lib/hash";
 
-export const createLearner = async (data: any) => {
+/**learner sign up */
+export const createLearner = async (
+  data: Omit<Learner, "id" | "createdAt" | "updatedAt">
+) => {
+  const { email, password } = data;
+  const existingUser = await prisma.learner.findUnique({ where: { email } });
+  const hash = await hashPassword(password);
+  if (!hash) throw new Error("password can't be hashed");
+
+  if (existingUser) throw new Error("Student found login");
   return await prisma.learner.create({
     data,
+    select: {
+      firstName: true,
+      lastName: true,
+      email: true,
+    },
   });
 };
 

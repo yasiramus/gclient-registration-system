@@ -6,7 +6,7 @@ const errorHandler = (err, req, res, next) => {
     console.log("Error occurred: ", err.message || err);
     if (err instanceof zod_1.ZodError) {
         return res.status(400).json({
-            status: "error",
+            status: "false",
             message: "Validation failed",
             errors: err.issues.map((e) => ({
                 field: e.path.join("."),
@@ -16,13 +16,13 @@ const errorHandler = (err, req, res, next) => {
     }
     if (err.message === "Track name already exists") {
         return res.status(409).json({
-            status: "error",
+            status: "false",
             message: "Track name already exists",
         });
     }
     const statusCode = err.status || 500;
     res.status(statusCode).json({
-        status: "error",
+        status: "false",
         message: err.message || "Internal Server Error",
     });
 };

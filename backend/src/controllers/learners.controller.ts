@@ -1,16 +1,29 @@
 import { Request, Response } from "express";
+
+import { sendResponse } from "../lib/sendResponse";
 import * as learners from "../services/learners.service";
 import { parseZod } from "../middleware/validateRequest";
 import {
   CreateLearnerSchema,
   getLearnersQuerySchema,
 } from "../schema/learner.schema";
-import { sendResponse } from "../lib/sendResponse";
 
+/**sign up */
 export const createLearner = parseZod(
   CreateLearnerSchema,
   async (req: Request, res: Response) => {
-    const learner = await learners.createLearner(req.body);
+    const data = req.body;
+    const { password, confirm_password } = data;
+
+    if (password !== confirm_password)
+      return sendResponse(res, {
+        status: false,
+        message: "password don't match",
+        statusCode: 401,
+      });
+
+    delete data.confirm_password; //delete confirm password before saving it to the db
+    const learner = await learners.createLearner(data);
     return sendResponse(res, {
       message: "Learner created",
       data: learner,

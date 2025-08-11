@@ -51,9 +51,9 @@ model Learner {
   firstName      String
   lastName       String
   email          String    @unique
-  password       String?
+  password       String
   enrolledTrack  Track?    @relation(fields: [trackId], references: [id])
-  trackId        String
+  trackId        String?
   enrolledCourse Course?   @relation(fields: [courseId], references: [id])
   courseId       String?
   // paymentStatus  PaymentStatus @default(PENDING)
