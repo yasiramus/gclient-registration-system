@@ -102,7 +102,8 @@ export const resetPassword = async (req: Request, res: Response) => {
 export const login = parseZod(
   LoginSchema,
   async (req: Request, res: Response) => {
-    const saveUser = await AuthService.logIn(req.body);
+    const { email, password } = req.body;
+    const saveUser = await AuthService.logIn(email, password);
     //set session data in cookie
     if (req.session) {
       req.session.user = { id: saveUser.id, role: saveUser.role };

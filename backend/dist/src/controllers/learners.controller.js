@@ -54,7 +54,7 @@ exports.createLearner = (0, validateRequest_1.parseZod)(learner_schema_1.CreateL
     if (password !== confirm_password)
         return (0, sendResponse_1.sendResponse)(res, {
             status: false,
-            message: "password don't match",
+            message: "passwords don't match",
             statusCode: 401,
         });
     delete data.confirm_password; //delete confirm password before saving it to the db

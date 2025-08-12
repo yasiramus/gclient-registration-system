@@ -4,7 +4,7 @@ import app from "../../src/app";
 import { testEmail, testPassword } from "../util";
 import { Learner } from "../../generated/prisma";
 
-describe("POSt /", () => {
+describe("POST /", () => {
   it("should register a new student", async () => {
     const res = await request(app).post("/gclient/api/student").send({
       firstName: "New",
@@ -13,7 +13,7 @@ describe("POSt /", () => {
       password: testPassword,
       confirm_password: testPassword,
     });
-    console.log("response: ", res.body);
+    console.log(res, "pp");
     expect(res.statusCode).toBe(201);
     expect(res.body.status).toBe(true);
     expect(res.body.message).toBe("Learner created");

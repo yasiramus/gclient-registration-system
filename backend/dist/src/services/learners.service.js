@@ -10,25 +10,43 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLearnerById = exports.getAllLearners = exports.createLearner = void 0;
+const prisma_1 = require("../../generated/prisma");
 const client_1 = require("../db/client");
 const hash_1 = require("../lib/hash");
+const mailer_1 = require("../lib/mail/mailer");
+const token_1 = require("../lib/token");
 /**learner sign up */
-const createLearner = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password } = data;
+const createLearner = (datas) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email, password } = datas;
     const existingUser = yield client_1.prisma.learner.findUnique({ where: { email } });
     const hash = yield (0, hash_1.hashPassword)(password);
     if (!hash)
         throw new Error("password can't be hashed");
+    const data = Object.assign(Object.assign({}, datas), { password: hash });
     if (existingUser)
-        throw new Error("Student found login");
-    return yield client_1.prisma.learner.create({
+        throw new Error("Email already registered");
+    const newLearner = yield client_1.prisma.learner.create({
         data,
         select: {
+            id: true,
             firstName: true,
             lastName: true,
             email: true,
         },
     });
+    if (!newLearner)
+        throw new Error("Unable to add a new learner");
+    // Generate a verification token
+    const verificationToken = yield (0, token_1.generateVerificationToken)(newLearner.id, "learner", prisma_1.VerificationType.EMAIL);
+    if (!verificationToken) {
+        throw new Error("Error generating verification token");
+    }
+    yield (0, mailer_1.sendMail)({
+        to: newLearner.email,
+        type: "VERIFY",
+        payload: verificationToken.token,
+    });
+    return newLearner;
 });
 exports.createLearner = createLearner;
 /**retrieve learners with optional filters */

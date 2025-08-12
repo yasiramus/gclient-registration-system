@@ -47,32 +47,54 @@ model Admin {
 }
 
 model Learner {
-  id             String    @id @default(uuid())
-  firstName      String
-  lastName       String
-  email          String    @unique
-  password       String
-  enrolledTrack  Track?    @relation(fields: [trackId], references: [id])
-  trackId        String?
-  enrolledCourse Course?   @relation(fields: [courseId], references: [id])
-  courseId       String?
+  id                 String              @id @default(uuid())
+  firstName          String
+  lastName           String
+  email              String              @unique
+  password           String
+  isVerified         Boolean             @default(false)
+  enrolledTrack      Track?              @relation(fields: [trackId], references: [id])
+  trackId            String?
+  enrolledCourse     Course?             @relation(fields: [courseId], references: [id])
+  courseId           String?
   // paymentStatus  PaymentStatus @default(PENDING)
-  invoices       Invoice[]
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  invoices           Invoice[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  verificationTokens VerificationToken[] // one-to-many
 }
 
-model VerificationToken {
-  id        String           @id @default(uuid())
-  type      VerificationType
-  token     String           @unique
-  adminId   String
-  admin     Admin            @relation(fields: [adminId], references: [id], onDelete: Cascade)
-  createdAt DateTime         @default(now())
-  expiresAt DateTime
-  usedAt    DateTime? //null= not used
+// model VerificationToken {
+//   id        String           @id @default(uuid())
+//   type      VerificationType
+//   token     String           @unique
+//   adminId   String?
+//   admin     Admin?           @relation(fields: [adminId], references: [id], onDelete: Cascade)
+//   learnerId String?
+//   learner   Learner?         @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+//   createdAt DateTime         @default(now())
+//   expiresAt DateTime
+//   usedAt    DateTime? //null= not used
 
-  @@index([adminId, createdAt], name: "idx_verification_user_created")
+//   @@index([adminId, createdAt], name: "idx_verification_user_created")
+// }
+
+model VerificationToken {
+  id    String           @id @default(uuid())
+  type  VerificationType
+  token String           @unique
+
+  adminId String?
+  admin   Admin?  @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  learnerId String?
+  learner   Learner? @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
+  usedAt    DateTime? // null = not used
+
+  @@index([adminId, learnerId, createdAt], name: "idx_verification_created")
 }
 
 model Track {

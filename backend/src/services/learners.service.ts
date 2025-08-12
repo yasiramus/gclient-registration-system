@@ -1,8 +1,10 @@
-import { Learner } from "../../generated/prisma";
+import { Learner, VerificationType } from "../../generated/prisma";
 import { prisma } from "../db/client";
 
 import { LearnerFilters } from "../interfaces/learners.int";
 import { hashPassword } from "../lib/hash";
+import { sendMail } from "../lib/mail/mailer";
+import { generateVerificationToken } from "../lib/token";
 
 /**learner sign up */
 export const createLearner = async (
@@ -15,14 +17,36 @@ export const createLearner = async (
 
   const data = { ...datas, password: hash };
   if (existingUser) throw new Error("Email already registered");
-  return await prisma.learner.create({
+  const newLearner = await prisma.learner.create({
     data,
     select: {
+      id: true,
       firstName: true,
       lastName: true,
       email: true,
     },
   });
+
+  if (!newLearner) throw new Error("Unable to add a new learner");
+
+  // Generate a verification token
+  const verificationToken = await generateVerificationToken(
+    newLearner.id,
+    // "learner",
+    VerificationType.EMAIL
+  );
+
+  if (!verificationToken) {
+    throw new Error("Error generating verification token");
+  }
+
+  await sendMail({
+    to: newLearner.email,
+    type: "VERIFY",
+    payload: verificationToken.token,
+  });
+
+  return newLearner;
 };
 
 /**retrieve learners with optional filters */

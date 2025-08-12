@@ -117,7 +117,8 @@ exports.resetPassword = resetPassword;
  * @param res - Express response object
  */
 exports.login = (0, validateRequest_1.parseZod)(auth_schema_1.LoginSchema, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const saveUser = yield AuthService.logIn(req.body);
+    const { email, password } = req.body;
+    const saveUser = yield AuthService.logIn(email, password);
     //set session data in cookie
     if (req.session) {
         req.session.user = { id: saveUser.id, role: saveUser.role };
