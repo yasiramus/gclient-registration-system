@@ -43,12 +43,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLearnerById = exports.fetchLearners = exports.createLearner = void 0;
+const sendResponse_1 = require("../lib/sendResponse");
 const learners = __importStar(require("../services/learners.service"));
 const validateRequest_1 = require("../middleware/validateRequest");
 const learner_schema_1 = require("../schema/learner.schema");
-const sendResponse_1 = require("../lib/sendResponse");
+/**sign up */
 exports.createLearner = (0, validateRequest_1.parseZod)(learner_schema_1.CreateLearnerSchema, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const learner = yield learners.createLearner(req.body);
+    const data = req.body;
+    const { password, confirm_password } = data;
+    if (password !== confirm_password)
+        return (0, sendResponse_1.sendResponse)(res, {
+            status: false,
+            message: "passwords don't match",
+            statusCode: 401,
+        });
+    delete data.confirm_password; //delete confirm password before saving it to the db
+    const learner = yield learners.createLearner(data);
     return (0, sendResponse_1.sendResponse)(res, {
         message: "Learner created",
         data: learner,

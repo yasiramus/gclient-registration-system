@@ -5,7 +5,7 @@ import { initializeTransaction } from "../lib/paystack";
 import { parseZod } from "../middleware/validateRequest";
 import { PaymentSchema } from "../schema/invoice.schema";
 /**
- * Initiates a payment transaction using Paystack.
+ * Initiates a payment transaction using Pay stack.
  * @param req - The request object containing learnerId and amountPaid.
  * @param res - The response object to send the result.
  */

@@ -9,24 +9,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateVerificationToken = generateVerificationToken;
-// import { randomUUID } from "crypto";
+exports.generateVerificationToken = void 0;
 const client_1 = require("../db/client");
 const generateOtp_1 = require("../utils/generateOtp");
 const date_1 = require("./date");
-function generateVerificationToken(userId, type) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const token = (0, generateOtp_1.generateOTP)(); //otp code generation
-        const expiresAt = (0, date_1.generateExpirationDate)(0, 5); // 5 minutes from now
-        // const token = randomUUID(); // OTP can also be used here if needed
-        const newToken = yield client_1.prisma.verificationToken.create({
-            data: {
-                token,
-                type,
-                adminId: userId,
-                expiresAt,
-            },
-        });
-        return newToken;
+const generateVerificationToken = (userId, userType, type) => __awaiter(void 0, void 0, void 0, function* () {
+    const token = (0, generateOtp_1.generateOTP)(); // OTP code generation
+    const expiresAt = (0, date_1.generateExpirationDate)(0, 5); // 5 minutes from now
+    // Build the data object dynamically
+    const tokenData = {
+        token,
+        type,
+        expiresAt,
+    };
+    if (userType === "admin") {
+        tokenData.adminId = userId;
+    }
+    else {
+        tokenData.learnerId = userId;
+    }
+    const newToken = yield client_1.prisma.verificationToken.create({
+        data: tokenData,
     });
-}
+    return newToken;
+});
+exports.generateVerificationToken = generateVerificationToken;

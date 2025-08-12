@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLearnersPerTrack = exports.getIncomePerTrack = exports.getTotalIncome = exports.getTotalLearners = void 0;
 const client_1 = require("../db/client");
 const sendResponse_1 = require("../lib/sendResponse");
-const report_services_1 = require("../services/report.services");
+const report_service_1 = require("../services/report.service");
 //Returns the total number of registered learners
 const getTotalLearners = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const totalLearners = yield client_1.prisma.learner
@@ -26,7 +26,7 @@ const getTotalLearners = (_req, res) => __awaiter(void 0, void 0, void 0, functi
 exports.getTotalLearners = getTotalLearners;
 //total income sum of all invoices
 const getTotalIncome = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const totalIncome = yield (0, report_services_1.incomePerInvoice)();
+    const totalIncome = yield (0, report_service_1.incomePerInvoice)();
     return (0, sendResponse_1.sendResponse)(res, {
         message: "Total income fetched",
         data: totalIncome._sum.amountPaid,
@@ -38,7 +38,7 @@ that is how much money has been paid by each learners
 in each track.
 */
 const getIncomePerTrack = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const incomeByTrack = yield (0, report_services_1.incomePerTrack)();
+    const incomeByTrack = yield (0, report_service_1.incomePerTrack)();
     return (0, sendResponse_1.sendResponse)(res, {
         message: "Income per track fetched",
         data: incomeByTrack !== null && incomeByTrack !== void 0 ? incomeByTrack : "inc",

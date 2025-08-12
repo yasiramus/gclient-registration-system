@@ -12,10 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.logIn = exports.resetPassword = exports.requestPasswordReset = exports.requestOTP = exports.verifyOTP = exports.registerAdmin = void 0;
 const client_1 = require("../db/client");
 const jwt_1 = require("../lib/jwt");
+const mailer_1 = require("../lib/mail/mailer");
 const token_1 = require("../lib/token");
 const prisma_1 = require("../../generated/prisma");
 const hash_1 = require("../lib/hash");
-const mailer_1 = require("../lib/mail/mailer");
 /**
  * Register a new user in the system.
  * @param user - The user data to register
@@ -48,7 +48,7 @@ const registerAdmin = (user) => __awaiter(void 0, void 0, void 0, function* () {
         throw new Error("Unable to add an Admin");
     }
     // Generate a verification token
-    const verificationToken = yield (0, token_1.generateVerificationToken)(admin.id, prisma_1.VerificationType.EMAIL);
+    const verificationToken = yield (0, token_1.generateVerificationToken)(admin.id, "admin", prisma_1.VerificationType.EMAIL);
     if (!verificationToken) {
         throw new Error("Error generating verification token");
     }
@@ -70,38 +70,80 @@ exports.registerAdmin = registerAdmin;
  * @returns A success message if the verification is successful
  * @throws Error if the code is invalid, expired, or already used
  */
+// export const verifyOTP = async (code: string, email: string) => {
+//   const admin = await prisma.admin.findUnique({ where: { email } });
+//   if (!admin) throw new Error("No account found with this email");
+//   if (admin.isVerified) {
+//     throw new Error("Email has already been verified");
+//   }
+//   // Check if the verification code exists and is valid
+//   const record = await prisma.verificationToken.findUnique({
+//     where: {
+//       token: code,
+//     },
+//   });
+//   if (!record || record.usedAt) {
+//     throw new Error("Invalid or expired code");
+//   }
+//   // Mark the code as used
+//   await prisma.verificationToken.update({
+//     where: { id: record.id },
+//     data: { usedAt: new Date() },
+//   });
+//   // mark user as verified
+//   const isVerified = await prisma.admin.update({
+//     where: { id: record.adminId },
+//     data: { isVerified: true },
+//   });
+//   if (!isVerified) throw new Error("Error verifying user");
+//   return {
+//     success: true,
+//     message: "Email verified",
+//     data: { id: isVerified.id, role: isVerified.role },
+//   };
+// };
 const verifyOTP = (code, email) => __awaiter(void 0, void 0, void 0, function* () {
-    const admin = yield client_1.prisma.admin.findUnique({ where: { email } });
-    if (!admin)
+    // Look up user
+    const [admin, learner] = yield client_1.prisma.$transaction([
+        client_1.prisma.admin.findUnique({ where: { email } }),
+        client_1.prisma.learner.findUnique({ where: { email } }),
+    ]);
+    const user = admin || learner;
+    const isAdmin = !!admin;
+    if (!user)
         throw new Error("No account found with this email");
-    if (admin.isVerified) {
+    if (user.isVerified)
         throw new Error("Email has already been verified");
-    }
-    // Check if the verification code exists and is valid
-    const record = yield client_1.prisma.verificationToken.findUnique({
-        where: {
-            token: code,
-        },
+    // Find matching token
+    const record = yield client_1.prisma.verificationToken.findFirst({
+        where: Object.assign({ token: code }, (isAdmin ? { adminId: user.id } : { learnerId: user.id })),
     });
-    if (!record || record.usedAt) {
+    if (!record || record.usedAt || record.expiresAt < new Date()) {
         throw new Error("Invalid or expired code");
     }
-    // Mark the code as used
+    // Mark token as used
     yield client_1.prisma.verificationToken.update({
         where: { id: record.id },
         data: { usedAt: new Date() },
     });
-    // mark user as verified
-    const isVerified = yield client_1.prisma.admin.update({
-        where: { id: record.adminId },
-        data: { isVerified: true },
-    });
-    if (!isVerified)
-        throw new Error("Error verifying user");
+    // Mark user as verified
+    const updatedUser = isAdmin
+        ? yield client_1.prisma.admin.update({
+            where: { id: user.id },
+            data: { isVerified: true },
+        })
+        : yield client_1.prisma.learner.update({
+            where: { id: user.id },
+            data: { isVerified: true },
+        });
+    const role = isAdmin ? admin.role : "learner";
     return {
         success: true,
-        message: "Email verified",
-        data: { id: isVerified.id, role: isVerified.role },
+        message: "Email verified successfully",
+        data: {
+            id: updatedUser.id,
+            role,
+        },
     };
 });
 exports.verifyOTP = verifyOTP;
@@ -112,15 +154,20 @@ exports.verifyOTP = verifyOTP;
  * @throws Error if the email is invalid, or already verified
  */
 const requestOTP = (email) => __awaiter(void 0, void 0, void 0, function* () {
-    const userFound = yield client_1.prisma.admin.findUnique({ where: { email } });
+    const [admin, learner] = yield client_1.prisma.$transaction([
+        client_1.prisma.admin.findUnique({ where: { email } }),
+        client_1.prisma.learner.findUnique({ where: { email } }),
+    ]);
+    const userFound = admin || learner;
     if (!userFound) {
         throw new Error("No account found with this email");
     }
     if (userFound.isVerified) {
         throw new Error("Email has already been verified");
     }
+    const isAdmin = !!admin;
     // Generate a verification token
-    const verificationToken = yield (0, token_1.generateVerificationToken)(userFound.id, prisma_1.VerificationType.EMAIL);
+    const verificationToken = yield (0, token_1.generateVerificationToken)(userFound.id, isAdmin ? "admin" : "learner", prisma_1.VerificationType.EMAIL);
     if (!verificationToken) {
         throw new Error("Error generating verification token");
     }
@@ -141,18 +188,24 @@ exports.requestOTP = requestOTP;
  */
 const requestPasswordReset = (email) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if user exists
-    const user = yield client_1.prisma.admin.findUnique({ where: { email } });
-    if (!user) {
-        throw new Error("No Account found with this email");
+    const [admin, learner] = yield client_1.prisma.$transaction([
+        client_1.prisma.admin.findUnique({ where: { email } }),
+        client_1.prisma.learner.findUnique({ where: { email } }),
+    ]);
+    const userFound = admin || learner;
+    if (!userFound) {
+        throw new Error("No account found with this email");
     }
-    const resetToken = yield (0, token_1.generateVerificationToken)(user.id, prisma_1.VerificationType.RESET);
+    const isAdmin = !!admin;
+    // resetToken
+    const resetToken = yield (0, token_1.generateVerificationToken)(userFound.id, isAdmin ? "admin" : "learner", prisma_1.VerificationType.RESET);
     if (!resetToken) {
         throw new Error("Error generating reset token");
     }
     console.log("Reset token created:", resetToken.token);
-    const password_reset_url = `${process.env.FRONTEND_URL}/verify-email?email=${user.email}`;
+    const password_reset_url = `${process.env.FRONTEND_URL}/verify-email?email=${userFound.email}`;
     yield (0, mailer_1.sendMail)({
-        to: user.email,
+        to: userFound.email,
         payload: password_reset_url,
         type: "RESET",
     });
@@ -171,7 +224,11 @@ exports.requestPasswordReset = requestPasswordReset;
  */
 const resetPassword = (email, newPassword) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if user exists
-    const user = yield client_1.prisma.admin.findUnique({ where: { email } });
+    const [admin, learner] = yield client_1.prisma.$transaction([
+        client_1.prisma.admin.findUnique({ where: { email } }),
+        client_1.prisma.learner.findUnique({ where: { email } }),
+    ]);
+    const user = admin || learner;
     if (!user) {
         throw new Error("No Account found with this email");
     }
@@ -198,23 +255,74 @@ exports.resetPassword = resetPassword;
  * @returns An object containing the user's ID and JWT token
  * @throws Error if the user does not exist or if the password is incorrect
  */
-const logIn = (user) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password } = user;
-    const existingUser = yield client_1.prisma.admin.findUnique({ where: { email } });
-    if (!existingUser || !existingUser.isVerified) {
+// export const logIn = async (role: string, user: IUser) => {
+//   const { email, password } = user;
+//   let isAdmin;
+//   if (role === "admin") {
+//     isAdmin = await prisma.admin.findUnique({ where: { email } });
+//     if (!isAdmin || !isAdmin.isVerified) {
+//       throw new Error("Invalid credentials");
+//     }
+//   }
+//   const adminPassword = isAdmin?.password as string;
+//   let isLearner;
+//   if (role === "learner") {
+//     isLearner = await prisma.learner.findUnique({ where: { email } });
+//     if (!isLearner) {
+//       throw new Error("Invalid credentials");
+//     }
+//   }
+//   const learnerPassword = isLearner?.password as string;
+//   const match = await compareHashPassword(
+//     password,
+//     adminPassword || learnerPassword
+//   );
+//   if (!match) {
+//     throw new Error("Invalid password credentials");
+//   }
+//   // NOTE: Reserved generateToken for email verification, password reset, or public API auth
+//   const token = generateToken(isAdmin?.id as string, isAdmin?.role as string);
+//   return {
+//     id: isAdmin?.id || isLearner?.id,
+//     role: isAdmin?.role,
+//     email: isAdmin?.email || isLearner?.email,
+//     fullName: `${isAdmin?.firstName || isLearner?.firstName} ${
+//       isAdmin?.lastName || isLearner?.lastName
+//     }`,
+//     token,
+//   };
+// };
+const logIn = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
+    // Query both Admin and Learner in parallel
+    const [admin, learner] = yield client_1.prisma.$transaction([
+        client_1.prisma.admin.findUnique({ where: { email } }),
+        client_1.prisma.learner.findUnique({ where: { email } }),
+    ]);
+    // If neither exists, invalid credentials
+    if (!admin && !learner) {
         throw new Error("Invalid credentials");
     }
-    const match = yield (0, hash_1.compareHashPassword)(password, existingUser.password);
-    if (!match) {
-        throw new Error("Invalid password credentials");
+    // Determine role & user
+    const isAdmin = !!admin;
+    const user = admin || learner;
+    // Check if account is verified
+    if (!(user === null || user === void 0 ? void 0 : user.isVerified)) {
+        throw new Error(`${isAdmin ? "Admin" : "Learner"} account not verified`);
     }
-    // NOTE: Reserved generateToken for email verification, password reset, or public API auth
-    const token = (0, jwt_1.generateToken)(existingUser.id, existingUser.role);
+    // Check password
+    const isMatch = yield (0, hash_1.compareHashPassword)(password, user.password);
+    if (!isMatch) {
+        throw new Error("Invalid credentials");
+    }
+    // Generate JWT token
+    const role = isAdmin ? admin.role : "learner";
+    const token = (0, jwt_1.generateToken)(user.id, role);
+    // Return payload
     return {
-        id: existingUser.id,
-        role: existingUser.role,
-        email: existingUser.email,
-        fullName: `${existingUser.firstName} ${existingUser.lastName}`,
+        id: user.id,
+        role,
+        email: user.email,
+        fullName: `${user.firstName} ${user.lastName}`,
         token,
     };
 });

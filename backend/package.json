@@ -39,6 +39,7 @@
     "prisma:generate": "prisma generate --no-engine",
     "prisma:migrate": "prisma migrate dev --name init",
     "prisma:reset": "prisma migrate reset --force --skip-seed",
+    "prisma:-all": "prisma migrate reset",
     "prisma:push": "prisma db push --force-reset",
     "prisma:db": "prisma db push",
     "prisma:studio": "prisma studio",

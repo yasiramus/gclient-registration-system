@@ -7,6 +7,10 @@ exports.CreateLearnerSchema = zod_1.z.object({
     lastName: zod_1.z.string().min(3).trim().nonempty("last name is required"),
     email: zod_1.z.email().trim().nonempty("email is required").toLowerCase(),
     password: zod_1.z.string().min(10).nonempty("password can't be empty"),
+    confirm_password: zod_1.z
+        .string()
+        .min(10)
+        .nonempty("confirm_password can't be empty"),
     trackId: zod_1.z.uuid().optional(),
     courseId: zod_1.z.uuid().optional(),
 });

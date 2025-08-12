@@ -15,7 +15,7 @@ const paystack_1 = require("../lib/paystack");
 const validateRequest_1 = require("../middleware/validateRequest");
 const invoice_schema_1 = require("../schema/invoice.schema");
 /**
- * Initiates a payment transaction using Paystack.
+ * Initiates a payment transaction using Pay stack.
  * @param req - The request object containing learnerId and amountPaid.
  * @param res - The response object to send the result.
  */
